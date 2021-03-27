@@ -4,7 +4,7 @@
 #include "PMS.h"
 #include "Stream.h"
 
-static const uint32_t PMS_READ_DELAY = 10000;
+static const uint32_t PMS_READ_DELAY = 30000;
 static PmsData FAILED_DATA = PmsData { false };
 
 PlantowerSensor::PlantowerSensor()

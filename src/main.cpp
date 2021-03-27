@@ -133,17 +133,12 @@ void setup(void) {
 
   pinMode(DISPLAY_BLK_PIN, OUTPUT);
   digitalWrite(DISPLAY_BLK_PIN, HIGH); // Backlight on
-  tft.setRotation(1);
-
+  tft.setRotation(3);
   tft.fillScreen(ST77XX_BLACK);
-
-  tft.setCursor(0, 0);
-  tft.setTextColor(ST77XX_WHITE);
+    tft.setTextColor(ST77XX_WHITE);
   tft.setTextSize(3);
   tft.setTextWrap(true);
-  tft.print("CO2: ");
-  tft.setCursor(0, 30);
-  tft.print("PM2: ");
+  tft.setCursor(30,80);tft.print("Initialization");
 
   mySerial.begin(BAUDRATE);                               // (Uno example) device to MH-Z19 serial start   
   ch2o = new Ze08CH2O{&mySerial};
@@ -159,6 +154,9 @@ void setup(void) {
 
   bme280 = new BME280Sensor(0x76);
   bme280->connect();
+
+  WiFi.forceSleepBegin();
+  delay(1);
 }
 
 void loop()
@@ -169,41 +167,38 @@ Serial.println(vcc);
 
 auto lightLevel = analogRead(A0);
 
+/*
 auto rssi = GetWifiSignalLevel();
 int strength = map(rssi, MIN_VAL, MAX_VAL, 0, 11);
+*/
 
- int CO2 = myMHZ19.getCO2(false); 
+ int CO2 = myMHZ19.getCO2(); 
+ float tempCO2 = myMHZ19.getTemperature();
 
 
   Ze08CH2O::concentration_t reading;
-
      mySerial.listen();
-  if (ch2o->read(reading)) {
-  }
+    ch2o->read(reading);
 
     pmsSerial.listen();
     auto pmsData = pms->readDataSyncronioslyAndSleep();
- 
-   
 
     auto bmeData = bme280->readData();
 
-    tft.fillRect(100, 0,100, 50, ST77XX_BLACK);
-    tft.setCursor(100, 0);
-    tft.print(CO2);
 
-    tft.setCursor(100, 30);
-    tft.print(pmsData.PM_2_5);
+  tft.fillRect(0, 0,320, 240, ST77XX_BLACK);
+  tft.setCursor(0, 0);tft.print("CO2: ");tft.setCursor(130, 0);tft.print(CO2);
+  tft.setCursor(0, 30);tft.print("PM2.5: ");tft.setCursor(130, 30);tft.print(pmsData.PM_2_5);
+  tft.setCursor(0, 60);tft.print("CH2O: ");tft.setCursor(130, 60);tft.print(reading);
+  
+  tft.setCursor(0, 120);tft.print("Temp BME: ");tft.setCursor(180, 120);tft.print(bmeData.temperatureCelsium);
+  tft.setCursor(0, 150);tft.print("Temp CO2: ");tft.setCursor(180, 150);tft.print(tempCO2);
+  tft.setCursor(0, 180);tft.print("Humidity: ");tft.setCursor(180, 180);tft.print(bmeData.humidityPercent);
+  tft.setCursor(0, 210);tft.print("Pressure: ");tft.setCursor(180, 210);tft.print(bmeData.pressureInHPascals);
+ 
+  tft.setCursor(230, 0);tft.print("L:");tft.setCursor(270, 0);tft.print(lightLevel * 100 / 1024);
 
-        tft.fillRect(00, 60,300, 300, ST77XX_CYAN);
-          tft.setTextColor(ST77XX_RED);
-    tft.setCursor(0, 100);
-    tft.print("Formald: ");tft.print(reading);
-    
-        tft.setCursor(0, 130);
-    tft.print("Temp: "); tft.print(bmeData.temperatureCelsium);
-
-    delay(2000);
+    delay(10000);
 }
 
 
