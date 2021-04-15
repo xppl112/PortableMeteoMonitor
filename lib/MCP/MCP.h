@@ -1,5 +1,5 @@
-#ifndef MCPEXTENDER_H
-#define MCPEXTENDER_H
+#ifndef MCP_H
+#define MCP_H
 
 #include <stdint.h>
 #include <Wire.h>
@@ -22,10 +22,10 @@
 #define MCP_B6 14
 #define MCP_B7 15
 
-class MCPExtender
+class MCP
 {
 public:
-  MCPExtender(uint8_t i2c_address);
+  MCP(uint8_t i2c_address);
 
   void connect();
   void pinMode(uint8_t pin, uint8_t direction, int8_t pullup = -1);

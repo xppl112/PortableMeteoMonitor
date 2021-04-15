@@ -1,0 +1,5 @@
+class ServerWeatherRequest
+{
+public:
+
+};
