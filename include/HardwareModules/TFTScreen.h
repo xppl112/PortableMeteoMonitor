@@ -14,8 +14,8 @@ class TFTScreen : public IHardwareModule
 {
 public:
     TFTScreen(
-        uint8_t width, 
-        uint8_t height, 
+        int width, 
+        int height, 
         uint8_t csPin, 
         uint8_t dcPin, 
         uint8_t resetPin, 
@@ -39,7 +39,7 @@ public:
     void reset() override;
     bool isConnected() override { return _isConnected; }
 
-    bool backLight(bool enable = true);
+    void backLight(bool enable = true);
 
     Adafruit_ST7789* get(){ return _screen; }
 
@@ -53,8 +53,8 @@ private:
     MCP *_mcp;
     #endif
 
-    uint8_t _width;
-    uint8_t _height; 
+    int _width;
+    int _height; 
     uint8_t _resetPin;
     uint8_t _backlightPin;
     uint8_t _spiMode;

@@ -1,8 +1,8 @@
 #include "HardwareModules/TFTScreen.h"
 
 TFTScreen::TFTScreen(
-    uint8_t width, 
-    uint8_t height, 
+    int width, 
+    int height, 
     uint8_t csPin, 
     uint8_t dcPin, 
     uint8_t resetPin, 
@@ -56,7 +56,7 @@ void TFTScreen::reset(){
     connect();
 }
 
-bool TFTScreen::backLight(bool enable){
+void TFTScreen::backLight(bool enable){
     if(!_useMcpForBacklight){
         digitalWrite(_backlightPin, enable);
     }

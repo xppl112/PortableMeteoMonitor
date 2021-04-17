@@ -1,11 +1,8 @@
 #include "HardwareModules/HardwareRegistry.h"
 #include "UI/LEDIndicatorsController.h"
-#include "UI/MenuController.h"
 #include "UI/ScreenController.h"
 #include "UI/InputsController.h"
-#include "UI/LEDDisplayController.h"
-#include "Models/WeatherMonitorData.h"
-#include "Healthchecks/HealthcheckController.h"
+#include "Models/AllSensorsData.h"
 
 class UIController
 {

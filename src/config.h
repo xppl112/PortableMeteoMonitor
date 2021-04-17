@@ -26,35 +26,36 @@ const uint8_t TFT_SPI_MODE = SPI_MODE2;
 const uint8_t TFT_RST = MCP_B5;
 const uint8_t TFT_BACKLIGHT = MCP_B4;
 
-const uint8_t TFT_WIDTH = 240;
-const uint8_t TFT_HEIGHT = 320;
+const int TFT_WIDTH = 240;
+const int TFT_HEIGHT = 320;
+const uint8_t TFT_ROTATION = 3;
 
 // Ze08CH2O module UART
 const uint8_t ZE08CH2O_RX_PIN = D6; 
 const uint8_t ZE08CH2O_TX_PIN = D0;
-const uint8_t ZE08CH2O_BAUDRATE = 9600;
+const int ZE08CH2O_BAUDRATE = 9600;
 
 // PMS module UART
 const uint8_t PMS_RX_PIN = D3; 
 const uint8_t PMS_TX_PIN = D8;
-const uint8_t PMS_BAUDRATE = 9600;
+const int PMS_BAUDRATE = 9600;
 
 // LED
-const uint8_t LED_TOP_RGB_R = MCP_B3;
-const uint8_t LED_TOP_RGB_G = MCP_B2;
+const uint8_t LED_TOP_RGB_R = MCP_A2;
+const uint8_t LED_TOP_RGB_G = MCP_B0;
 const uint8_t LED_TOP_RGB_B = MCP_B1;
-const uint8_t LED_BOTTOM_RGB_R = MCP_A0;
-const uint8_t LED_BOTTOM_RGB_G = MCP_A1;
-const uint8_t LED_BOTTOM_RGB_B = MCP_A2;
+const uint8_t LED_BOTTOM_RGB_R = MCP_A3;
+const uint8_t LED_BOTTOM_RGB_G = MCP_B2;
+const uint8_t LED_BOTTOM_RGB_B = MCP_B3;
 
 // BUTTONS
-const uint8_t TOUCH_BUTTON_PIN = MCP_A6;
-const uint8_t LEFT_BUTTON_PIN = MCP_A5;
-const uint8_t CENTER_BUTTON_PIN = MCP_A4;
-const uint8_t RIGHT_BUTTON_PIN = MCP_A3;
+const uint8_t TOUCH_BUTTON_PIN = MCP_A5;
+const uint8_t LEFT_BUTTON_PIN = MCP_A7;
+const uint8_t CENTER_BUTTON_PIN = MCP_A6;
+const uint8_t RIGHT_BUTTON_PIN = MCP_A4;
 
 // MISC DEVICES
-const uint8_t BUZZER_PIN = MCP_A7;
+const uint8_t BUZZER_PIN = MCP_B7;//>????
 const uint8_t LIGHT_SENSOR_PIN = A0;
 
 struct BackendClientConfig {

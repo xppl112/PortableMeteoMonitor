@@ -1,19 +1,18 @@
 #include "HardwareModules/HardwareRegistry.h"
-#include "OLED.h"
-#include "Models/WeatherMonitorData.h"
+#include "HardwareModules/TFTScreen.h"
+#include "Models/AllSensorsData.h"
+#include "Log4Esp.h"
 
 class ScreenController
 {
 public:
-    ScreenController(HardwareRegistry* HardwareRegistry);
+    ScreenController(HardwareRegistry* hardwareRegistry, Logger* logger);
     void clearScreen();
     void showSplashScreen();
-    void showIndoorWeather(WeatherMonitorData weatherData);
-    void showOutdoorTemperature(WeatherMonitorData weatherData);
-    void showOutdoorHumidityAndPressure(WeatherMonitorData weatherData);
-    void showAirQualityMeasurements(WeatherMonitorData weatherData);
-    void showAirPollution(WeatherMonitorData weatherData);
+    void showMainScreen(AllSensorsData data);
 
 private:
-    OLED* _oled;
+    TFTScreen* _screenDevice;
+    Adafruit_ST7789* _screen;
+    Logger* _logger;
 };

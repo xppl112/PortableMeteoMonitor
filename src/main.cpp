@@ -6,11 +6,11 @@ Logger _logger;
 HardwareRegistry _hardwareRegistry;
 
 void setup() {
-  Serial.begin(9600);
+    Serial.begin(9600);
 
-  _logger = Logger("defaultLogger", false);
-  _hardwareRegistry = HardwareRegistryFactory::createHardwareRegistry();
-  _hardwareRegistry.reconnectAllDisconnectedDevices();
+    _logger = Logger("defaultLogger", false);
+    _hardwareRegistry = HardwareRegistryFactory::createHardwareRegistry();
+    _hardwareRegistry.reconnectAllDisconnectedDevices();
 }
 
 void loop()
