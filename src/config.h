@@ -55,7 +55,7 @@ const uint8_t CENTER_BUTTON_PIN = MCP_A6;
 const uint8_t RIGHT_BUTTON_PIN = MCP_A4;
 
 // MISC DEVICES
-const uint8_t BUZZER_PIN = MCP_B7;//>????
+const uint8_t BUZZER_PIN = MCP_A1;
 const uint8_t LIGHT_SENSOR_PIN = A0;
 
 struct BackendClientConfig {
