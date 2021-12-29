@@ -29,7 +29,7 @@ HttpResponse EspWifiClient::sendGetRequest(String host, String resource, uint8_t
     HttpResponse httpResponse;
 
     HTTPClient client;
-    client.begin(host + resource);
+    client.begin(_wifiClient, host + resource);
     client.setTimeout(timeoutSeconds * 1000);
 
     int resultCode = client.GET();
@@ -55,7 +55,7 @@ HttpResponse EspWifiClient::sendPostJsonRequest(String host, String resource, St
     HttpResponse httpResponse;
 
     HTTPClient client;
-    client.begin(host + resource);
+    client.begin(_wifiClient, host + resource);
     client.addHeader("Content-Type", "application/json");
     client.setTimeout(timeoutSeconds * 1000);    
 

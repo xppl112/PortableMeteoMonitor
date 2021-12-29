@@ -3,6 +3,7 @@
 
 #include <map>
 #include "HardwareModules/IHardwareModule.h"
+#include <stdint.h>
 
 typedef uint8_t HardwareId;
 

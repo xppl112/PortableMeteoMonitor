@@ -33,6 +33,7 @@ public:
 
 private:
     uint8_t _analogPin;
+    const uint16_t PWMRANGE = 255;
 };
 
 #endif

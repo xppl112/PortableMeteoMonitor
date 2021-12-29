@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stream.h>
 #include <ESP8266WiFi.h>
+#include <WiFiClient.h>
 
 struct HttpResponse {
     bool success;
@@ -22,6 +23,7 @@ public:
   bool isWifiConnected;
 
 private:
+  WiFiClient _wifiClient;
   String _wifiSsid;
   String _wifiPassword;
   int _wifiStatus;
