@@ -1,4 +1,6 @@
-class AllSensorsData
+#pragma once
+
+class WeatherMonitorData
 {
 public:
     int CO2;
@@ -11,6 +13,4 @@ public:
     float temperatureCelsium;
     float humidityPercent;
     float pressureInHPascals;
-
-    int lightLevelPercent;
 };

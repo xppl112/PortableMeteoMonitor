@@ -2,39 +2,27 @@
 #include "UI/LEDIndicatorsController.h"
 #include "UI/ScreenController.h"
 #include "UI/InputsController.h"
-#include "Models/AllSensorsData.h"
+#include "Models/WeatherMonitorData.h"
+#include "Log4Esp.h"
 
 class UIController
 {
 public:
-    UIController(HardwareRegistry* HardwareRegistry, HealthcheckController* healthcheckController);
+    UIController(HardwareRegistry* HardwareRegistry, Logger* logger);
     void updateUI();
     void onWeatherUpdated(WeatherMonitorData weatherMonitorData);
-    void enableMenuMode(bool debugMode = false);
-    void disableMenuMode();
 
 private:
-    enum class ScreenMode {OFF, TEMPERATURE_OUTSIDE, AIR_POLLUTION, METEO_OUTSIDE, METEO_INSIDE, AIR_QULITY};
-    enum class LedDisplayMode {OFF, TEMPERATURE_OUTSIDE, AIR_POLLUTION};
+    enum class ScreenMode {OFF, MAIN_DASHBOARD};
     void updateInputs();
     void redrawUI();
-    void flipScreenMode(bool forward);
 
-    MenuController* _menuController;
+    Logger* _logger;
     ScreenController* _screen;
-    LEDDisplayController* _ledDisplayController;
     LEDIndicatorsController* _ledIndicators;
     InputsController* _inputsController;
 
     WeatherMonitorData _currentWeather;
-    bool _isMenuMode = false;
-    unsigned long _lastInteractionTimestamp = 0;
-    bool _isInteraction = false;
-    void onInteraction();
-    void updateOutputDevicesStatus();
 
-    ScreenMode _currentScreenMode = ScreenMode::AIR_POLLUTION;
-    LedDisplayMode _currentLedDisplayMode = LedDisplayMode::TEMPERATURE_OUTSIDE;
-    bool _isScreenActive = true;
-    bool _isLedDisplayActive = true;
+    ScreenMode _currentScreenMode = ScreenMode::MAIN_DASHBOARD;
 };

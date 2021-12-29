@@ -1,10 +1,18 @@
 #include "ApplicationServices/WeatherMonitor.h"
 #include "Config.h"
-#include "GlobalObjects/GlobalSystemState.h"
-extern GlobalSystemState* globalSystemState;
 
-WeatherMonitor::WeatherMonitor(HardwareRegistry* HardwareRegistry){
-    _HardwareRegistry = HardwareRegistry;
+WeatherMonitor::WeatherMonitor(HardwareRegistry* hardwareRegistry, Logger* logger){
+    _logger = logger;
+    
+    _airParticiplesSensor = hardwareRegistry->getDevice<AirParticiplesSensor>
+        ((HardwareId)HardwareIdList::AIR_PARTICIPLES_SENSOR);
+    _CH2OSensor = hardwareRegistry->getDevice<CH2OSensor>
+        ((HardwareId)HardwareIdList::CH2O_SENSOR);
+    _CO2Sensor = hardwareRegistry->getDevice<CO2Sensor>
+        ((HardwareId)HardwareIdList::CO2_SENSOR);
+    _meteoSensor = hardwareRegistry->getDevice<MeteoSensor>
+        ((HardwareId)HardwareIdList::METEO_SENSOR);
+    
     _timer = new Ticker(0);
 }
 
@@ -14,9 +22,7 @@ void WeatherMonitor::run(){
 }
 
 void WeatherMonitor::updateTimers(){
-    if(globalSystemState->systemHealth != HealthStatus::HEALTH_ERROR)
-        _timer->update();
-
+    _timer->update();
     if(_timer->state() == FIRED){
         if(state == WeatherMonitorState::IDLE)startMeasuring();
         else if(state == WeatherMonitorState::MEASURING)finishMeasuring();
@@ -29,47 +35,41 @@ void WeatherMonitor::addUpdatedEventHandler(WeatherMonitorUpdatedEventCallback c
 }
 
 void WeatherMonitor::startMeasuring(){
-    _timer->interval(WEATHER_MONITOR_MEASUREMENT_DURATION_SECONDS * 1000);
-    state = WeatherMonitorState::MEASURING;    
-    globalSystemState->setSystemStatus(SystemStatus::Measuring);    
-    _startMeasuringTimestamp = globalSystemState->getCurrentTimestamp();
+    _timer->interval(PMS_DEFAULT_MEASUREMENT_DURATION_SECONDS * 1000);
+    state = WeatherMonitorState::MEASURING;
     
-    _HardwareRegistry->airParticiplesSensor->beginMeasurement();
+    _airParticiplesSensor->beginMeasurement();
 }
 
 void WeatherMonitor::finishMeasuring(){
-    if(globalSystemState->isNightMode)_timer->interval(WEATHER_MONITOR_INTERVAL_NIGHT_SECONDS * 1000);
-    else _timer->interval(WEATHER_MONITOR_INTERVAL_SECONDS * 1000);
+    _timer->interval(10 * 1000);
     WeatherMonitorData data;
 
-    PmsData airParticiplesData = _HardwareRegistry->airParticiplesSensor->endMeasurement();
-    BME280Data outdoorMeteoData = _HardwareRegistry->outdoorMeteoSensor->getData();
-    DHTData indoorMeteoData = _HardwareRegistry->indoorMeteoSensor->getData();
-
-    data.isOutsideMeteoDataReceived = outdoorMeteoData.isDataReceived;
-    data.isInsideMeteoDataReceived = indoorMeteoData.isDataReceived;
-    data.isPMDataReceived = airParticiplesData.isDataReceived;
-    data.timeStampOfStart = _startMeasuringTimestamp;
-    data.timeStampOfFinish = globalSystemState->getCurrentTimestamp();
+    auto airParticiplesData = _airParticiplesSensor->endMeasurement();
+    auto ch2oData = _CH2OSensor->getData();
+    auto co2Data = _CO2Sensor->getData();
+    auto meteoData = _meteoSensor->getData();
 
     if(airParticiplesData.isDataReceived){
-        data.PM1_0 = airParticiplesData.PM_1_0;
-        data.PM2_5 = airParticiplesData.PM_2_5;
+        data.PM_1_0 = airParticiplesData.PM_1_0;
+        data.PM_2_5 = airParticiplesData.PM_2_5;
         data.PM_10_0 = airParticiplesData.PM_10_0;
     }
 
-    if(outdoorMeteoData.isDataReceived){
-        data.temperatureOutside = outdoorMeteoData.temperatureCelsium;
-        data.humidityOutside = outdoorMeteoData.humidityPercent;
-        data.pressureOutside = outdoorMeteoData.pressureInHPascals;
+    if(ch2oData.isDataReceived){
+        data.CH2O = ch2oData.concentration;
     }
 
-    if(indoorMeteoData.isDataReceived){
-        data.temperatureInside = indoorMeteoData.temperatureCelsium;
-        data.humidityInside = indoorMeteoData.humidityPercent;
+    if(co2Data.isDataReceived){
+        data.CO2 = co2Data.concentration;
     }
 
-    state = WeatherMonitorState::IDLE;
-    globalSystemState->setSystemStatus(SystemStatus::Idle);    
+    if(meteoData.isDataReceived){
+        data.temperatureCelsium = meteoData.temperatureCelsium;
+        data.humidityPercent = meteoData.humidityPercent;
+        data.pressureInHPascals = meteoData.pressureInHPascals;
+    }
+
+    state = WeatherMonitorState::IDLE;   
     if(_onUpdateCallback != NULL) _onUpdateCallback(data);
 }

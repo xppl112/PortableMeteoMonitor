@@ -12,7 +12,8 @@ enum class HardwareIdList {
     CH2O_SENSOR, 
     CO2_SENSOR, 
     METEO_SENSOR,
-    LIGHT_SENSOR};
+    LIGHT_SENSOR,
+    BUZZER};
 
 // I2C
 const uint8_t BME_I2C_ADDR = 0x76;
@@ -39,6 +40,7 @@ const int ZE08CH2O_BAUDRATE = 9600;
 const uint8_t PMS_RX_PIN = D3; 
 const uint8_t PMS_TX_PIN = D8;
 const int PMS_BAUDRATE = 9600;
+const short PMS_DEFAULT_MEASUREMENT_DURATION_SECONDS = 30;
 
 // LED
 const uint8_t LED_TOP_RGB_R = MCP_A2;
@@ -55,7 +57,7 @@ const uint8_t CENTER_BUTTON_PIN = MCP_A6;
 const uint8_t RIGHT_BUTTON_PIN = MCP_A4;
 
 // MISC DEVICES
-const uint8_t BUZZER_PIN = MCP_B7;//>????
+const uint8_t BUZZER_PIN = MCP_B1;
 const uint8_t LIGHT_SENSOR_PIN = A0;
 
 struct BackendClientConfig {

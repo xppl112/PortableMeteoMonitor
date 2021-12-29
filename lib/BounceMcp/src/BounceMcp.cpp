@@ -135,7 +135,7 @@ bool Debouncer::fell()
 ////////////
 
 
-Bounce::Bounce(MCPExtender* mcp)
+Bounce::Bounce(MCP* mcp)
     : pin(0), mcp(mcp)
 {}
 

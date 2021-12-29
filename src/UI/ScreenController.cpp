@@ -27,7 +27,7 @@ void ScreenController::showSplashScreen(){
     _screen->print("Initialization");
 }
 
-void ScreenController::showMainScreen(AllSensorsData data){
+void ScreenController::showMainScreen(WeatherMonitorData data){
     clearScreen();
     _screen->setCursor(0, 0);_screen->print("CO2: ");_screen->setCursor(130, 0);_screen->print(data.CO2);
     _screen->setCursor(0, 30);_screen->print("PM2.5: ");_screen->setCursor(130, 30);_screen->print(data.PM_2_5);
@@ -36,8 +36,6 @@ void ScreenController::showMainScreen(AllSensorsData data){
     _screen->setCursor(0, 120);_screen->print("Temp BME: ");_screen->setCursor(180, 120);_screen->print(data.temperatureCelsium);
     _screen->setCursor(0, 180);_screen->print("Humidity: ");_screen->setCursor(180, 180);_screen->print(data.humidityPercent);
     _screen->setCursor(0, 210);_screen->print("Pressure: ");_screen->setCursor(180, 210);_screen->print(data.pressureInHPascals);
-
-    _screen->setCursor(230, 0);_screen->print("L:");_screen->setCursor(270, 0);_screen->print(data.lightLevelPercent);
 }
 
 

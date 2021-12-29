@@ -9,8 +9,8 @@ LEDIndicatorsController::LEDIndicatorsController(HardwareRegistry* hardwareRegis
         _logger->error("mcpExtender is not connected during initializing LEDIndicatorsController");
     }
 
-    _topLed = McpRGBLed(mcpExtender->get(), LED_TOP_RGB_R, LED_TOP_RGB_G, LED_TOP_RGB_B, false);
-    _bottomLed = McpRGBLed(mcpExtender->get(), LED_BOTTOM_RGB_R, LED_BOTTOM_RGB_G, LED_BOTTOM_RGB_B, false);
+    _topLed = new McpRGBLed(mcpExtender->get(), LED_TOP_RGB_R, LED_TOP_RGB_G, LED_TOP_RGB_B, false);
+    _bottomLed = new McpRGBLed(mcpExtender->get(), LED_BOTTOM_RGB_R, LED_BOTTOM_RGB_G, LED_BOTTOM_RGB_B, false);
 
     _timerSlow = new Ticker(1000, NULL, MILLIS); 
     _timerSlow->start();
@@ -31,12 +31,23 @@ void LEDIndicatorsController::setPollutionLevel(WeatherMonitorData weatherData){
 }
 */
 
-void LEDIndicatorsController::setWeatherStatus(AllSensorsData data){  
-    _topLed.setColor(RGBLedColor::GREEN);
-    _bottomLed.setColor(RGBLedColor::YELLOW);
+void LEDIndicatorsController::setButtonTest(short button){  
+    switch (button)
+    {
+        case 1: _topLed->setColor(RGBLedColor::RED); break;
+        case 2: _topLed->setColor(RGBLedColor::GREEN); break;
+        case 3: _bottomLed->setColor(RGBLedColor::YELLOW); break;
+        case 4: _bottomLed->setColor(RGBLedColor::PURPLE); break;
+        default: clearAllIndicators();
+    }
+}
+
+void LEDIndicatorsController::setWeatherStatus(WeatherMonitorData data){  
+    _topLed->setColor(RGBLedColor::GREEN);
+    _bottomLed->setColor(RGBLedColor::YELLOW);
 }
 
 void LEDIndicatorsController::clearAllIndicators(){
-    _topLed.setColor(RGBLedColor::BLACK);
-    _bottomLed.setColor(RGBLedColor::BLACK);
+    _topLed->setColor(RGBLedColor::BLACK);
+    _bottomLed->setColor(RGBLedColor::BLACK);
 }
