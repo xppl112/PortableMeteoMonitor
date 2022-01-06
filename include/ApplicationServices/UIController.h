@@ -3,7 +3,7 @@
 #include "UI/ScreenController.h"
 #include "UI/InputsController.h"
 #include "Models/Enums/View.h"
-#include "Models/WeatherMonitorData.h"
+#include "Models/PresentingData.h"
 #include "Log4Esp.h"
 #include <Ticker.h>
 
@@ -12,7 +12,7 @@ class UIController
 public:
     UIController(HardwareRegistry* HardwareRegistry, Logger* logger);
     void updateUI();
-    void onWeatherUpdated(WeatherMonitorData weatherMonitorData);
+    void onPresentingDataUpdate(PresentingData presentingData);
 
 private:
     void updateInputs();
@@ -24,7 +24,7 @@ private:
     InputsController* _inputsController;
     Ticker* _timer;
 
-    WeatherMonitorData _currentWeather;
+    PresentingData _currentPresentingData;
 
     View _currentView = View::MAIN_DASHBOARD;
     bool isSoundEnabled = false;

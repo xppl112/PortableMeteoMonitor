@@ -3,6 +3,8 @@
 struct WeatherMonitorData
 {
 public:
+    unsigned long timestamp;
+
     int CO2 = -1;
     int CH2O = -1;
 

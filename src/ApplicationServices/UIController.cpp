@@ -42,12 +42,12 @@ void UIController::updateInputs() {
     }
 }
 
-void UIController::onWeatherUpdated(WeatherMonitorData weatherMonitorData){
-    _currentWeather = weatherMonitorData;
+void UIController::onPresentingDataUpdate(PresentingData presentingData){
+    _currentPresentingData = presentingData;
     redrawUI();
 }
 
 void UIController::redrawUI(){
-    _ledIndicators->setWeatherStatus(_currentWeather);
-    _screen->showDataScreen(_currentView, _currentWeather);
+    _ledIndicators->setWeatherStatus(_currentPresentingData.weatherMonitorHistoricalData.back());
+    _screen->showDataScreen(_currentView, _currentPresentingData);
 }

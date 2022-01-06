@@ -17,7 +17,11 @@ void ScreenController::clearScreen(){
     _screen->setCursor(0, 0);
 }
 
-void ScreenController::showDataScreen(View view, WeatherMonitorData data){
+void ScreenController::backlight(bool on){
+    _screenDevice->backLight(on);
+}
+
+void ScreenController::showDataScreen(View view, PresentingData data){
     switch(view){
         case View::MAIN_DASHBOARD:
             _dashboardScreen->show(data);

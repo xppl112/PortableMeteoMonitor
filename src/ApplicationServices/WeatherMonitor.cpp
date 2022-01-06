@@ -73,5 +73,19 @@ void WeatherMonitor::finishMeasuring(bool runWithoutStart){
         data.pressureInHPascals = meteoData.pressureInHPascals;
     }
 
-    if(_onUpdateCallback != NULL) _onUpdateCallback(data);
+    registerWeatherData(data);
+}
+
+void WeatherMonitor::registerWeatherData(WeatherMonitorData data){
+    _weatherMonitorHistoricalData.push_back(data);
+    if(_weatherMonitorHistoricalData.size() > DATA_COLLECTION_CAPACITY){
+        _weatherMonitorHistoricalData.pop_front();
+    }
+
+    if(_onUpdateCallback != NULL){
+        PresentingData presentingData {
+            .weatherMonitorHistoricalData = _weatherMonitorHistoricalData
+        };
+         _onUpdateCallback(presentingData);
+    }
 }

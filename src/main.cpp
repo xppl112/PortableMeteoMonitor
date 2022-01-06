@@ -7,7 +7,7 @@ Logger* logger;
 HardwareRegistry* hardwareRegistry;
 WeatherMonitor* weatherMonitor;
 UIController* uiController;
-void onWeatherUpdatedEventHandler(WeatherMonitorData weatherMonitorData);
+void onPresentingDataUpdateEventHandler(PresentingData presentingData);
 
 void setup() {
     Serial.begin(9600);
@@ -19,7 +19,7 @@ void setup() {
     uiController = new UIController(hardwareRegistry, logger);
     weatherMonitor = new WeatherMonitor(hardwareRegistry, logger);
 
-    weatherMonitor->addUpdatedEventHandler(onWeatherUpdatedEventHandler);
+    weatherMonitor->addUpdatedEventHandler(onPresentingDataUpdateEventHandler);
     weatherMonitor->run();
 }
 
@@ -30,6 +30,6 @@ void loop()
     weatherMonitor->updateTimers();
 }
 
-void onWeatherUpdatedEventHandler(WeatherMonitorData weatherMonitorData){
-    uiController->onWeatherUpdated(weatherMonitorData);
+void onPresentingDataUpdateEventHandler(PresentingData presentingData){
+    uiController->onPresentingDataUpdate(presentingData);
 }

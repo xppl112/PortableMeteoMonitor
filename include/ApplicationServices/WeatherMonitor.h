@@ -1,13 +1,15 @@
 #include "HardwareModules/HardwareRegistry.h"
 #include "Models/WeatherMonitorData.h"
+#include "Models/PresentingData.h"
 #include <Ticker.h>
 #include "HardwareModules/Sensors/AirParticiplesSensor.h"
 #include "HardwareModules/Sensors/CH2OSensor.h"
 #include "HardwareModules/Sensors/CO2Sensor.h"
 #include "HardwareModules/Sensors/MeteoSensor.h"
 #include "Log4Esp.h"
+#include <list>
 
-typedef void (*WeatherMonitorUpdatedEventCallback)(WeatherMonitorData);
+typedef void (*WeatherMonitorUpdatedEventCallback)(PresentingData);
 
 class WeatherMonitor
 {
@@ -24,6 +26,7 @@ public:
 private:
     void startMeasuring();
     void finishMeasuring(bool runWithoutStart = false);
+    void registerWeatherData(WeatherMonitorData data);
 
     Logger* _logger;
 
@@ -35,4 +38,6 @@ private:
     CH2OSensor* _CH2OSensor;
     CO2Sensor* _CO2Sensor;
     MeteoSensor* _meteoSensor;
+
+    std::list<WeatherMonitorData> _weatherMonitorHistoricalData;
 };
