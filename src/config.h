@@ -5,15 +5,10 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-enum class HardwareIdList {
-    MCP_EXTENDER, 
-    TFT_SCREEN,
-    AIR_PARTICIPLES_SENSOR, 
-    CH2O_SENSOR, 
-    CO2_SENSOR, 
-    METEO_SENSOR,
-    LIGHT_SENSOR,
-    BUZZER};
+const short DEFAULT_MEASUREMENT_DURATION_SECONDS = 30;
+const short DEFAULT_CALMDOWN_DURATION_SECONDS = 10;
+const int HEALTHCHECK_INTERVAL_MS = 1000;
+const int UI_REDRAW_INTERVAL_MS = 1000;
 
 // I2C
 const uint8_t BME_I2C_ADDR = 0x76;
@@ -40,7 +35,6 @@ const int ZE08CH2O_BAUDRATE = 9600;
 const uint8_t PMS_RX_PIN = D3; 
 const uint8_t PMS_TX_PIN = D8;
 const int PMS_BAUDRATE = 9600;
-const short PMS_DEFAULT_MEASUREMENT_DURATION_SECONDS = 30;
 
 // LED
 const uint8_t LED_TOP_RGB_R = MCP_A2;

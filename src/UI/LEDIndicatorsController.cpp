@@ -4,7 +4,7 @@
 
 LEDIndicatorsController::LEDIndicatorsController(HardwareRegistry* hardwareRegistry, Logger* logger){
     _logger = logger;
-    auto mcpExtender = hardwareRegistry->getDevice<MCPExtender>((HardwareId)HardwareIdList::MCP_EXTENDER);
+    auto mcpExtender = hardwareRegistry->_MCPExtender;
     if(!mcpExtender->isConnected()){
         _logger->error("mcpExtender is not connected during initializing LEDIndicatorsController");
     }
@@ -32,19 +32,19 @@ void LEDIndicatorsController::setPollutionLevel(WeatherMonitorData weatherData){
 */
 
 void LEDIndicatorsController::setButtonTest(short button){  
+    clearAllIndicators();
     switch (button)
     {
         case 1: _topLed->setColor(RGBLedColor::RED); break;
         case 2: _topLed->setColor(RGBLedColor::GREEN); break;
         case 3: _bottomLed->setColor(RGBLedColor::YELLOW); break;
         case 4: _bottomLed->setColor(RGBLedColor::PURPLE); break;
-        default: clearAllIndicators();
     }
 }
 
 void LEDIndicatorsController::setWeatherStatus(WeatherMonitorData data){  
-    _topLed->setColor(RGBLedColor::GREEN);
-    _bottomLed->setColor(RGBLedColor::YELLOW);
+    //_topLed->setColor(RGBLedColor::GREEN);
+    //_bottomLed->setColor(RGBLedColor::YELLOW);
 }
 
 void LEDIndicatorsController::clearAllIndicators(){

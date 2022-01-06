@@ -24,8 +24,7 @@ CO2SensorData CO2Sensor::getData(){
     data.concentration = _sensor->getCO2(); 
     data.temperature = _sensor->getTemperature();
 
-    if(data.concentration < 0 || data.concentration > 5000)
-        data.isDataReceived = false;
+    data.isDataReceived = data.concentration >= 1 && data.concentration <= 5000;
 
     this->registerDataFetching(data.isDataReceived);
 

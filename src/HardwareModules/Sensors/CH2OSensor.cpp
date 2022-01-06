@@ -11,27 +11,28 @@ void CH2OSensor::connect(){
 }
 
 void CH2OSensor::reset(){
-
+    _serial->end();
+    connect();
 }
 
 CH2OSensorData CH2OSensor::getData(){
     CH2OSensorData data;
     data.isDataReceived = false;
 
-    if(!_isConnected)
-        return data;
+    if(!_isConnected)return data;
 
-    Ze08CH2O::concentration_t reading;
+    Ze08CH2O::concentration_t concentration;
     _serial->listen();
-    if(!_sensor->read(reading))
-        return data;
+    _serial->begin(9600);
 
-    data.concentration = reading;
+    if(_sensor->getGasConcentration(concentration)){
+        data.concentration = concentration;
 
-    if(data.concentration >= 0 && data.concentration <= 5000)
-        data.isDataReceived = true;
+        if(data.concentration >= 0 && data.concentration <= 5000)
+            data.isDataReceived = true;
+    }
 
     this->registerDataFetching(data.isDataReceived);
-
+    
     return data;
 }

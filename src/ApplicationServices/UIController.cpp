@@ -8,11 +8,18 @@ UIController::UIController(HardwareRegistry* HardwareRegistry, Logger* logger)
     _ledIndicators = new LEDIndicatorsController(HardwareRegistry, logger);
     _inputsController = new InputsController(HardwareRegistry, logger);
 
-    _screen->showSplashScreen();
+    _timer = new Ticker(UI_REDRAW_INTERVAL_MS);
+    _timer->start(true);    
 }
 
 void UIController::updateUI() {
     updateInputs();
+    
+    _timer->update();
+    if(_timer->state() == FIRED){
+        redrawUI();
+        _timer->start();
+    }
 }
 
 void UIController::updateInputs() {
@@ -42,9 +49,5 @@ void UIController::onWeatherUpdated(WeatherMonitorData weatherMonitorData){
 
 void UIController::redrawUI(){
     _ledIndicators->setWeatherStatus(_currentWeather);
-
-    switch (_currentScreenMode){
-        case ScreenMode::OFF: _screen->clearScreen();break;
-        case ScreenMode::MAIN_DASHBOARD: _screen->showMainScreen(_currentWeather);break;
-    } 
+    _screen->showDataScreen(_currentView, _currentWeather);
 }

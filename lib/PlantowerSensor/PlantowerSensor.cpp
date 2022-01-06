@@ -27,16 +27,6 @@ PlantowerSensor::PlantowerSensor(Stream* serial, uint8_t setPin) : PlantowerSens
 
 bool PlantowerSensor::connect(bool connectionProbe)
 {
-    if(_rxPin != 0 || _txPin != 0){
-        // Create serial bus using Software serial
-        _serial = new SoftwareSerial(_rxPin, _txPin);
-    }
-    else if(_serial == NULL){
-        //Use hardware serial
-        Serial.begin(PMS::BAUD_RATE);
-        _serial = &Serial;
-    }
-
     _pms = new PMS(*_serial);    
 
     // Switch to passive mode.

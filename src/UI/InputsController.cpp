@@ -3,7 +3,7 @@
 
 InputsController::InputsController(HardwareRegistry* hardwareRegistry, Logger* logger){
     _logger = logger;
-    auto mcpExtender = hardwareRegistry->getDevice<MCPExtender>((HardwareId)HardwareIdList::MCP_EXTENDER);
+    auto mcpExtender = hardwareRegistry->_MCPExtender;
     if(!mcpExtender->isConnected()){
         _logger->error("mcpExtender is not connected during initializing InputsController");
     }

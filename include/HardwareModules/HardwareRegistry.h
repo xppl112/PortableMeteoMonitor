@@ -1,28 +1,42 @@
 #ifndef HardwareRegistry_H
 #define HardwareRegistry_H
 
-#include <map>
 #include "HardwareModules/IHardwareModule.h"
 #include <stdint.h>
+#include <Ticker.h>
+#include "Log4Esp.h"
 
-typedef uint8_t HardwareId;
+#include "HardwareModules/Sensors/AirParticiplesSensor.h"
+#include "HardwareModules/Sensors/CH2OSensor.h"
+#include "HardwareModules/Sensors/CO2Sensor.h"
+#include "HardwareModules/Sensors/MeteoSensor.h"
+#include "HardwareModules/Sensors/LightSensor.h"
+#include "HardwareModules/MCPExtender.h"
+#include "HardwareModules/TFTScreen.h"
+#include "HardwareModules/BuzzerModule.h"
 
 class HardwareRegistry
 {
 public:
-    HardwareRegistry();
+    HardwareRegistry(Logger* logger);
 
-    template<typename DeviceType>
-    bool registerDevice(HardwareId deviceId, DeviceType* device);
-
-    template<typename DeviceType>
-    DeviceType* getDevice(HardwareId deviceId);
-
-    void resetDevice(HardwareId deviceId);
-    void reconnectAllDisconnectedDevices(bool onlyCritical = false);
+    void healthCheck();
+    void reconnectAllDisconnectedDevices();
     
+    AirParticiplesSensor *_airParticiplesSensor;
+    CH2OSensor *_CH2OSensor;
+    CO2Sensor *_CO2Sensor;
+    MeteoSensor *_meteoSensor;
+    LightSensor *_lightSensor;
+    MCPExtender *_MCPExtender;
+    TFTScreen *_TFTScreen;
+    BuzzerModule *_buzzerModule;
+
 private:
-    std::map<HardwareId, IHardwareModule*> _hardwareModules;
+    Logger* _logger;
+    Ticker* _timer;
+
+    void initializeDevices();
 };
 
 #endif

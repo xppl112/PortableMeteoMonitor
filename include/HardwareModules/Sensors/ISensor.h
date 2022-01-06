@@ -4,7 +4,7 @@
 #include "HardwareModules/IHardwareModule.h"
 
 struct SensorDataBase {
-  bool isDataReceived;
+  bool isDataReceived = false;
 };
 
 class ISensor : public IHardwareModule
@@ -13,11 +13,11 @@ class ISensor : public IHardwareModule
         virtual short int getFailedDataFetchingTreshold() = 0;
         void registerDataFetching(bool success){
             // if we don't receive data for times, mark sensor as unconnected
-            auto failedDataFetchingTredhold = getFailedDataFetchingTreshold();
+            auto failedDataFetchingTreshold = getFailedDataFetchingTreshold();
             if(!success){
                 _failedDataFetchingCount++;
-                if(failedDataFetchingTredhold != -1 && 
-                   _failedDataFetchingCount >= failedDataFetchingTredhold)
+                if(failedDataFetchingTreshold != -1 && 
+                   _failedDataFetchingCount >= failedDataFetchingTreshold)
                     this->_isConnected = false;
             }
             else _failedDataFetchingCount = 0;

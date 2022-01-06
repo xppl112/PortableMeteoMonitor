@@ -23,7 +23,7 @@ public:
 
 private:
     void startMeasuring();
-    void finishMeasuring();
+    void finishMeasuring(bool runWithoutStart = false);
 
     Logger* _logger;
 

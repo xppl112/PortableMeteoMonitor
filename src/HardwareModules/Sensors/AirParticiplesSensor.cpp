@@ -13,7 +13,8 @@ void AirParticiplesSensor::connect(){
 }
 
 void AirParticiplesSensor::reset(){
-    
+    _serial->end();
+    connect();
 }
 
 void AirParticiplesSensor::beginMeasurement(){

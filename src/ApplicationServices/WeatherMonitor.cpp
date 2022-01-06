@@ -4,29 +4,34 @@
 WeatherMonitor::WeatherMonitor(HardwareRegistry* hardwareRegistry, Logger* logger){
     _logger = logger;
     
-    _airParticiplesSensor = hardwareRegistry->getDevice<AirParticiplesSensor>
-        ((HardwareId)HardwareIdList::AIR_PARTICIPLES_SENSOR);
-    _CH2OSensor = hardwareRegistry->getDevice<CH2OSensor>
-        ((HardwareId)HardwareIdList::CH2O_SENSOR);
-    _CO2Sensor = hardwareRegistry->getDevice<CO2Sensor>
-        ((HardwareId)HardwareIdList::CO2_SENSOR);
-    _meteoSensor = hardwareRegistry->getDevice<MeteoSensor>
-        ((HardwareId)HardwareIdList::METEO_SENSOR);
+    _airParticiplesSensor = hardwareRegistry->_airParticiplesSensor;
+    _CH2OSensor = hardwareRegistry->_CH2OSensor;
+    _CO2Sensor = hardwareRegistry->_CO2Sensor;
+    _meteoSensor = hardwareRegistry->_meteoSensor;
     
     _timer = new Ticker(0);
 }
 
 void WeatherMonitor::run(){
-    state = WeatherMonitorState::IDLE;
-    _timer->start();    
+    state = WeatherMonitorState::MEASURING;
+    _timer->start(true);
+    finishMeasuring(true);
 }
 
 void WeatherMonitor::updateTimers(){
     _timer->update();
     if(_timer->state() == FIRED){
-        if(state == WeatherMonitorState::IDLE)startMeasuring();
-        else if(state == WeatherMonitorState::MEASURING)finishMeasuring();
-        _timer->resetStatus();
+        if(state == WeatherMonitorState::IDLE){
+            startMeasuring();
+            state = WeatherMonitorState::MEASURING;
+            _timer->interval(DEFAULT_MEASUREMENT_DURATION_SECONDS * 1000);
+        }
+        else if(state == WeatherMonitorState::MEASURING){
+            finishMeasuring();
+            state = WeatherMonitorState::IDLE;   
+            _timer->interval(DEFAULT_CALMDOWN_DURATION_SECONDS * 1000);
+        }
+        _timer->start();
     }
 }
 
@@ -35,17 +40,15 @@ void WeatherMonitor::addUpdatedEventHandler(WeatherMonitorUpdatedEventCallback c
 }
 
 void WeatherMonitor::startMeasuring(){
-    _timer->interval(PMS_DEFAULT_MEASUREMENT_DURATION_SECONDS * 1000);
-    state = WeatherMonitorState::MEASURING;
-    
     _airParticiplesSensor->beginMeasurement();
 }
 
-void WeatherMonitor::finishMeasuring(){
-    _timer->interval(10 * 1000);
+void WeatherMonitor::finishMeasuring(bool runWithoutStart){
     WeatherMonitorData data;
 
-    auto airParticiplesData = _airParticiplesSensor->endMeasurement();
+    AirParticiplesSensorData airParticiplesData;
+    if(!runWithoutStart)airParticiplesData = _airParticiplesSensor->endMeasurement();
+
     auto ch2oData = _CH2OSensor->getData();
     auto co2Data = _CO2Sensor->getData();
     auto meteoData = _meteoSensor->getData();
@@ -70,6 +73,5 @@ void WeatherMonitor::finishMeasuring(){
         data.pressureInHPascals = meteoData.pressureInHPascals;
     }
 
-    state = WeatherMonitorState::IDLE;   
     if(_onUpdateCallback != NULL) _onUpdateCallback(data);
 }

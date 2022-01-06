@@ -1,11 +1,10 @@
 #include <config.h>
 #include "Log4Esp.h"
-#include "HardwareModules/HardwareRegistryFactory.h"
 #include "ApplicationServices/WeatherMonitor.h"
 #include "ApplicationServices/UIController.h"
 
-Logger* _logger;
-HardwareRegistry* _hardwareRegistry;
+Logger* logger;
+HardwareRegistry* hardwareRegistry;
 WeatherMonitor* weatherMonitor;
 UIController* uiController;
 void onWeatherUpdatedEventHandler(WeatherMonitorData weatherMonitorData);
@@ -13,12 +12,12 @@ void onWeatherUpdatedEventHandler(WeatherMonitorData weatherMonitorData);
 void setup() {
     Serial.begin(9600);
 
-    _logger = new Logger("defaultLogger", false);
-    _hardwareRegistry = HardwareRegistryFactory::createHardwareRegistry();
-    _hardwareRegistry->reconnectAllDisconnectedDevices();
+    logger = new Logger("defaultLogger", false);
+    hardwareRegistry = new HardwareRegistry(logger);
+    hardwareRegistry->reconnectAllDisconnectedDevices();
 
-    uiController = new UIController(_hardwareRegistry, _logger);
-    weatherMonitor = new WeatherMonitor(_hardwareRegistry, _logger);
+    uiController = new UIController(hardwareRegistry, logger);
+    weatherMonitor = new WeatherMonitor(hardwareRegistry, logger);
 
     weatherMonitor->addUpdatedEventHandler(onWeatherUpdatedEventHandler);
     weatherMonitor->run();
@@ -26,6 +25,7 @@ void setup() {
 
 void loop()
 {
+    hardwareRegistry->healthCheck();
     uiController->updateUI();
     weatherMonitor->updateTimers();
 }
