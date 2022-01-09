@@ -45,6 +45,7 @@ void WeatherMonitor::startMeasuring(){
 
 void WeatherMonitor::finishMeasuring(bool runWithoutStart){
     WeatherMonitorData data;
+    data.timestamp = millis();
 
     AirParticiplesSensorData airParticiplesData;
     if(!runWithoutStart)airParticiplesData = _airParticiplesSensor->endMeasurement();
@@ -79,13 +80,23 @@ void WeatherMonitor::finishMeasuring(bool runWithoutStart){
 void WeatherMonitor::registerWeatherData(WeatherMonitorData data){
     _weatherMonitorHistoricalData.push_back(data);
     if(_weatherMonitorHistoricalData.size() > DATA_COLLECTION_CAPACITY){
-        _weatherMonitorHistoricalData.pop_front();
+        _weatherMonitorHistoricalData.erase(_weatherMonitorHistoricalData.begin());
     }
 
     if(_onUpdateCallback != NULL){
         PresentingData presentingData {
             .weatherMonitorHistoricalData = _weatherMonitorHistoricalData
         };
+
+        if(data.CO2 > CO2_LEVEL_WARNING) presentingData.CO2WarningLevel = WarningLevel::WARNING;
+        else if(data.CO2 > CO2_LEVEL_ALERT) presentingData.CO2WarningLevel = WarningLevel::HI_WARNING_LEVEL;
+
+        if(data.PM_2_5 > PM2_5_LEVEL_WARNING) presentingData.PMWarningLevel = WarningLevel::WARNING;
+        else if(data.PM_2_5 > PM2_5_LEVEL_ALERT) presentingData.PMWarningLevel = WarningLevel::HI_WARNING_LEVEL;
+
+        if(data.CH2O > CH2O_LEVEL_WARNING) presentingData.CH2OWarningLevel = WarningLevel::WARNING;
+        else if(data.CH2O > CH2O_LEVEL_ALERT) presentingData.CH2OWarningLevel = WarningLevel::HI_WARNING_LEVEL;
+
          _onUpdateCallback(presentingData);
     }
 }

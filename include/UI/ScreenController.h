@@ -13,6 +13,7 @@ public:
     void clearScreen();
     void backlight(bool on);
     void showDataScreen(View view, PresentingData data);
+    void showMainButtons();
 
 private:
     TFTScreen* _screenDevice;
@@ -20,4 +21,8 @@ private:
     Logger* _logger;
 
     DashboardScreen* _dashboardScreen;
+
+    static const uint16_t MainButtonsDividerColor = 0x3186;
+    static const uint16_t MainButtonsBackground = 0x3186;
+    static const uint16_t MainButtonsDefaultTextColor = 0xAD75;
 };

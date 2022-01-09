@@ -7,7 +7,7 @@
 #include "HardwareModules/Sensors/CO2Sensor.h"
 #include "HardwareModules/Sensors/MeteoSensor.h"
 #include "Log4Esp.h"
-#include <list>
+#include <vector>
 
 typedef void (*WeatherMonitorUpdatedEventCallback)(PresentingData);
 
@@ -39,5 +39,5 @@ private:
     CO2Sensor* _CO2Sensor;
     MeteoSensor* _meteoSensor;
 
-    std::list<WeatherMonitorData> _weatherMonitorHistoricalData;
+    std::vector<WeatherMonitorData> _weatherMonitorHistoricalData;
 };

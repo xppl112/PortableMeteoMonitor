@@ -11,6 +11,13 @@ const int HEALTHCHECK_INTERVAL_MS = 1000;
 const int UI_REDRAW_INTERVAL_MS = 1000;
 static const uint8_t DATA_COLLECTION_CAPACITY = 30;
 
+static const int CO2_LEVEL_WARNING = 800;
+static const int CO2_LEVEL_ALERT = 1400;
+static const int PM2_5_LEVEL_WARNING = 36;
+static const int PM2_5_LEVEL_ALERT = 56;
+static const int CH2O_LEVEL_WARNING = 40;
+static const int CH2O_LEVEL_ALERT = 100;
+
 // I2C
 const uint8_t BME_I2C_ADDR = 0x76;
 const uint8_t MCP_EXTENDER_I2C_ADDR = 0x20;

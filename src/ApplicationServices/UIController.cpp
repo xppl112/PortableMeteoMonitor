@@ -17,7 +17,7 @@ void UIController::updateUI() {
     
     _timer->update();
     if(_timer->state() == FIRED){
-        redrawUI();
+        //redrawUI();
         _timer->start();
     }
 }

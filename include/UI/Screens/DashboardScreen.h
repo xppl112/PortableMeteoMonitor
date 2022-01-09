@@ -14,7 +14,9 @@ public:
 
 private:
     Adafruit_ST7789* _screen;
-    MetricTile *_co2Tile, *_PMTile, *_ch2oTile, *_outTempTile, *_outPMTile;
+    MetricTile *_co2Tile, *_PMTile, *_ch2oTile, *_outTempTile, *_outPMTile, *_outPressureTile;
+
+    TileStatus mapWarningLevelToTileStatus(WarningLevel level);
 };
 
 #endif
