@@ -1,6 +1,6 @@
 #include "HardwareModules/HardwareRegistry.h"
 #include "Models/WeatherMonitorData.h"
-#include "Models/PresentingData.h"
+#include "Models/PresentingWeatherData.h"
 #include <Ticker.h>
 #include "HardwareModules/Sensors/AirParticiplesSensor.h"
 #include "HardwareModules/Sensors/CH2OSensor.h"
@@ -9,7 +9,8 @@
 #include "Log4Esp.h"
 #include <vector>
 
-typedef void (*WeatherMonitorUpdatedEventCallback)(PresentingData);
+typedef void (*WeatherMonitorUpdatedEventCallback)(PresentingWeatherData);
+typedef void (*BlockingEventCallback)(bool);
 
 class WeatherMonitor
 {
@@ -18,6 +19,7 @@ public:
     void run();
     void updateTimers();
     void addUpdatedEventHandler(WeatherMonitorUpdatedEventCallback callback);
+    void addBlockingEventHandler(BlockingEventCallback callback);
     void reconnectSensors();
     void resetSensors();
     enum class WeatherMonitorState {DISABLED, IDLE, MEASURING};
@@ -31,6 +33,7 @@ private:
     Logger* _logger;
 
     WeatherMonitorUpdatedEventCallback _onUpdateCallback;
+    BlockingEventCallback _onBlockingCallback;
     Ticker* _timer;
     unsigned long _startMeasuringTimestamp;
 

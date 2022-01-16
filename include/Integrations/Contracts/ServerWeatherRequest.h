@@ -1,5 +1,0 @@
-class ServerWeatherRequest
-{
-public:
-
-};

@@ -1,6 +1,7 @@
 #include "HardwareModules/HardwareRegistry.h"
 #include "HardwareModules/MCPExtender.h"
-#include "Models/WeatherMonitorData.h"
+#include "Models/PresentingWeatherData.h"
+#include "Models/PresentingBackendWeatherData.h"
 #include <Ticker.h>
 #include "McpRGBLed.h"
 #include "Log4Esp.h"
@@ -9,10 +10,9 @@ class LEDIndicatorsController
 {
 public:
     LEDIndicatorsController(HardwareRegistry* hardwareRegistry, Logger* logger);
-    void setWeatherStatus(WeatherMonitorData data);
+    void setWeatherStatus(PresentingWeatherData data);
+    void setWeatherStatus(PresentingBackendWeatherData data);
     void clearAllIndicators();
-    
-    void setButtonTest(short button);
 
 private:
     Logger* _logger;

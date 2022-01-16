@@ -14,17 +14,14 @@ class EspWifiClient
 public:
   EspWifiClient();
 
-  bool connectWifi(const char* ssid, const char* password, uint8_t timeoutSeconds = 10);
+  bool connectWifi(const char * ssid, const char * password, uint8_t timeoutSeconds = 10);
   void disconnectWifi();  
+  bool isWifiConnected();  
 
   HttpResponse sendGetRequest(String host, String resource, uint8_t timeoutSeconds = 10);
   HttpResponse sendPostJsonRequest(String host, String resource, String jsonPayload, uint8_t timeoutSeconds = 10);
 
-  bool isWifiConnected;
-
 private:
   WiFiClient _wifiClient;
-  String _wifiSsid;
-  String _wifiPassword;
   int _wifiStatus;
 };

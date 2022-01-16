@@ -4,25 +4,22 @@
 
 EspWifiClient::EspWifiClient(){
     _wifiStatus = WL_IDLE_STATUS;
-    isWifiConnected = false;
 }
 
 bool EspWifiClient::connectWifi(const char* ssid, const char* password, uint8_t timeoutSeconds){
-    _wifiSsid = ssid;
-    _wifiPassword = password;
-    isWifiConnected = false;
-
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
     _wifiStatus = WiFi.waitForConnectResult(timeoutSeconds * 1000);
 
-    isWifiConnected = WiFi.isConnected();
-    return isWifiConnected;
+    return isWifiConnected();
 }
 
 void EspWifiClient::disconnectWifi() {
     _wifiStatus = WiFi.disconnect(true);
-    isWifiConnected = false;
+}
+
+bool EspWifiClient::isWifiConnected() {
+    return WiFi.isConnected();
 }
 
 HttpResponse EspWifiClient::sendGetRequest(String host, String resource, uint8_t timeoutSeconds){

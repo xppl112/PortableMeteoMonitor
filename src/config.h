@@ -1,15 +1,16 @@
+#pragma once
+
 #include <Arduino.h>
 #include <MCP.h>
 #include <SPI.h>
-
-#ifndef CONFIG_H
-#define CONFIG_H
 
 const short DEFAULT_MEASUREMENT_DURATION_SECONDS = 30;
 const short DEFAULT_CALMDOWN_DURATION_SECONDS = 10;
 const int HEALTHCHECK_INTERVAL_MS = 1000;
 const int UI_REDRAW_INTERVAL_MS = 1000;
 static const uint8_t DATA_COLLECTION_CAPACITY = 30;
+
+static const uint16_t BACKEND_REFRESH_INTERVAL_SECONDS = 30;
 
 static const int CO2_LEVEL_WARNING = 800;
 static const int CO2_LEVEL_ALERT = 1400;
@@ -62,13 +63,10 @@ const uint8_t RIGHT_BUTTON_PIN = MCP_A4;
 const uint8_t BUZZER_PIN = MCP_A1;
 const uint8_t LIGHT_SENSOR_PIN = A0;
 
-struct BackendClientConfig {
-    const char* WifiSSID = "xppl";
-    const char* WifiPassword = "william2015";
+// BACKEND INTEGRATION
+#define WIFI_SSID "Sasha home"
+#define WIFI_PASSWORD "0672589600"
 
-    const char* ServerHost = "http://194.58.70.17:5100";
-    const char* ServerApiGetTimeUrl = "/api/time";
-};
-
-
-#endif
+#define SERVER_HOST "http://weather.liashko.space"
+#define SERVER_API_GET_TIME "/api/time"
+#define SERVER_API_GET_OUTDOOR_WEATHER "/api/weather/getlastdata"

@@ -6,10 +6,16 @@ UIController::UIController(HardwareRegistry* HardwareRegistry, Logger* logger)
     _logger = logger;
     _screen = new ScreenController(HardwareRegistry, logger);
     _ledIndicators = new LEDIndicatorsController(HardwareRegistry, logger);
+    _soundController = new SoundController(HardwareRegistry, logger);
     _inputsController = new InputsController(HardwareRegistry, logger);
 
     _timer = new Ticker(UI_REDRAW_INTERVAL_MS);
-    _timer->start(true);    
+    _timer->start(true);
+
+    //Draw splash data
+    onPresentingWeatherDataUpdate(_currentPresentingWeatherData);
+    onPresentingBackendWeatherDataUpdate(_currentPresentingBackendWeatherData);
+    onNetworkStatusChange(NetworkStatus::DISABLED);
 }
 
 void UIController::updateUI() {
@@ -27,27 +33,65 @@ void UIController::updateInputs() {
 
     switch(buttonPressed){
         case ButtonPressed::TOUCH:
-            _ledIndicators->setButtonTest(1);
             break;
         case ButtonPressed::LEFT:
-            _ledIndicators->setButtonTest(2);
             break;
         case ButtonPressed::CENTER:
-            _ledIndicators->setButtonTest(3);
+            toggleLedEnabling();
             break;
         case ButtonPressed::RIGHT:
-            _ledIndicators->setButtonTest(4);
+            toggleSoundEnabling();
             break;
         case ButtonPressed::NONE:break;
     }
 }
 
-void UIController::onPresentingDataUpdate(PresentingData presentingData){
-    _currentPresentingData = presentingData;
-    redrawUI();
+void UIController::onPresentingWeatherDataUpdate(PresentingWeatherData presentingWeatherData){
+    _currentPresentingWeatherData = presentingWeatherData;
+    
+    if(_isLedEnabled)_ledIndicators->setWeatherStatus(_currentPresentingWeatherData);
+    if(_isSoundEnabled)_soundController->setWarningLevel(_currentPresentingWeatherData.GetOverallWarningLevel());
+    _screen->showDataScreen(_currentView, _currentPresentingWeatherData);
+    
+    drawInterface();
 }
 
-void UIController::redrawUI(){
-    _ledIndicators->setWeatherStatus(_currentPresentingData.weatherMonitorHistoricalData.back());
-    _screen->showDataScreen(_currentView, _currentPresentingData);
+void UIController::onPresentingBackendWeatherDataUpdate(PresentingBackendWeatherData presentingBackendWeatherData){
+    _currentPresentingBackendWeatherData = presentingBackendWeatherData;
+    
+    if(_isLedEnabled)_ledIndicators->setWeatherStatus(_currentPresentingBackendWeatherData);
+    _screen->showDataScreen(_currentView, _currentPresentingBackendWeatherData);
+    
+    drawInterface();
+}
+
+void UIController::onNetworkStatusChange(NetworkStatus networkStatus){
+    _screen->showNetworkStatusIcon(networkStatus);
+}
+
+void UIController::onBlocking(bool isBlocked){
+    _isBlocked = isBlocked;
+    drawInterface();
+}
+
+void UIController::drawInterface(){
+    _screen->showMainButtons(_isBlocked, _isLedEnabled, _isSoundEnabled);
+}
+
+void UIController::toggleLedEnabling(){
+    _isLedEnabled = !_isLedEnabled;
+    drawInterface();
+    if(_isLedEnabled){
+        _ledIndicators->setWeatherStatus(_currentPresentingWeatherData);
+        _ledIndicators->setWeatherStatus(_currentPresentingBackendWeatherData);
+    }
+    else _ledIndicators->clearAllIndicators();
+}
+
+void UIController::toggleSoundEnabling(){
+    _isSoundEnabled = !_isSoundEnabled;
+    drawInterface();
+    if(_isSoundEnabled){
+        _soundController->shortBeep();
+    }
 }

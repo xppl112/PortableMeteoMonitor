@@ -1,5 +1,0 @@
-class NewsRequest
-{
-public:
-
-};

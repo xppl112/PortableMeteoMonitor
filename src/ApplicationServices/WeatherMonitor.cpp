@@ -15,7 +15,6 @@ WeatherMonitor::WeatherMonitor(HardwareRegistry* hardwareRegistry, Logger* logge
 void WeatherMonitor::run(){
     state = WeatherMonitorState::MEASURING;
     _timer->start(true);
-    finishMeasuring(true);
 }
 
 void WeatherMonitor::updateTimers(){
@@ -39,6 +38,10 @@ void WeatherMonitor::addUpdatedEventHandler(WeatherMonitorUpdatedEventCallback c
     _onUpdateCallback = callback;
 }
 
+void WeatherMonitor::addBlockingEventHandler(BlockingEventCallback callback){
+    _onBlockingCallback = callback;
+}
+
 void WeatherMonitor::startMeasuring(){
     _airParticiplesSensor->beginMeasurement();
 }
@@ -46,6 +49,8 @@ void WeatherMonitor::startMeasuring(){
 void WeatherMonitor::finishMeasuring(bool runWithoutStart){
     WeatherMonitorData data;
     data.timestamp = millis();
+
+    if(_onBlockingCallback != NULL)_onBlockingCallback(true);
 
     AirParticiplesSensorData airParticiplesData;
     if(!runWithoutStart)airParticiplesData = _airParticiplesSensor->endMeasurement();
@@ -75,6 +80,8 @@ void WeatherMonitor::finishMeasuring(bool runWithoutStart){
     }
 
     registerWeatherData(data);
+
+    if(_onBlockingCallback != NULL)_onBlockingCallback(false);
 }
 
 void WeatherMonitor::registerWeatherData(WeatherMonitorData data){
@@ -84,19 +91,22 @@ void WeatherMonitor::registerWeatherData(WeatherMonitorData data){
     }
 
     if(_onUpdateCallback != NULL){
-        PresentingData presentingData {
+        PresentingWeatherData PresentingWeatherData {
             .weatherMonitorHistoricalData = _weatherMonitorHistoricalData
         };
 
-        if(data.CO2 > CO2_LEVEL_WARNING) presentingData.CO2WarningLevel = WarningLevel::WARNING;
-        else if(data.CO2 > CO2_LEVEL_ALERT) presentingData.CO2WarningLevel = WarningLevel::HI_WARNING_LEVEL;
+        if(data.CO2 > CO2_LEVEL_ALERT) PresentingWeatherData.CO2WarningLevel = WarningLevel::HI_WARNING_LEVEL;
+        else if(data.CO2 > CO2_LEVEL_WARNING) PresentingWeatherData.CO2WarningLevel = WarningLevel::WARNING;
+        else if(data.CO2 != -1) PresentingWeatherData.CO2WarningLevel = WarningLevel::LOW_WARNING_LEVEL;
 
-        if(data.PM_2_5 > PM2_5_LEVEL_WARNING) presentingData.PMWarningLevel = WarningLevel::WARNING;
-        else if(data.PM_2_5 > PM2_5_LEVEL_ALERT) presentingData.PMWarningLevel = WarningLevel::HI_WARNING_LEVEL;
+        if(data.PM_2_5 > PM2_5_LEVEL_ALERT) PresentingWeatherData.PMWarningLevel = WarningLevel::HI_WARNING_LEVEL;
+        else if(data.PM_2_5 > PM2_5_LEVEL_WARNING) PresentingWeatherData.PMWarningLevel = WarningLevel::WARNING;
+        else if(data.PM_2_5 != -1) PresentingWeatherData.PMWarningLevel = WarningLevel::LOW_WARNING_LEVEL;
+        
+        if(data.CH2O > CH2O_LEVEL_ALERT) PresentingWeatherData.CH2OWarningLevel = WarningLevel::HI_WARNING_LEVEL;
+        else if(data.CH2O > CH2O_LEVEL_WARNING) PresentingWeatherData.CH2OWarningLevel = WarningLevel::WARNING;
+        else if(data.CH2O != -1)PresentingWeatherData.CH2OWarningLevel = WarningLevel::LOW_WARNING_LEVEL;
 
-        if(data.CH2O > CH2O_LEVEL_WARNING) presentingData.CH2OWarningLevel = WarningLevel::WARNING;
-        else if(data.CH2O > CH2O_LEVEL_ALERT) presentingData.CH2OWarningLevel = WarningLevel::HI_WARNING_LEVEL;
-
-         _onUpdateCallback(presentingData);
+         _onUpdateCallback(PresentingWeatherData);
     }
 }

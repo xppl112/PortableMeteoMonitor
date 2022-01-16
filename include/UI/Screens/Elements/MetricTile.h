@@ -72,8 +72,8 @@ private:
     static const uint16_t AlertBorderColor = 0xF800;
 
     GraphDesign _graphDesign[5] = {
-        GraphDesign {.LineColor = 0x2333, .BackgroundColor = 0x19CA},//blue
-        GraphDesign {.LineColor = 0x8334, .BackgroundColor = 0x5A2D},//purple
+        GraphDesign {.LineColor = 0x4399, .BackgroundColor = 0x3291},//blue
+        GraphDesign {.LineColor = 0x8B75, .BackgroundColor = 0x726E},//purple
         GraphDesign {.LineColor = 0x7D4D, .BackgroundColor = 0x43E7},//green
         GraphDesign {.LineColor = 0xF5E7, .BackgroundColor = 0x8367},//yellow
         GraphDesign {.LineColor = 0xD924, .BackgroundColor = 0x90E3} //red

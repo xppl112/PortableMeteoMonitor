@@ -30,12 +30,13 @@ DashboardScreen::DashboardScreen(Adafruit_ST7789* screen){
     _outPressureTile->setTitle("out pressure");
 }
 
-void DashboardScreen::show(PresentingData data){
-    if(data.weatherMonitorHistoricalData.size() != 0){
-        std::vector<TileDataItem> tileData(DATA_COLLECTION_CAPACITY);
+void DashboardScreen::showWeatherData(PresentingWeatherData weatherData){
+    std::vector<TileDataItem> tileData(DATA_COLLECTION_CAPACITY);
+
+    if(weatherData.weatherMonitorHistoricalData.size() != 0){
         //CO2
         tileData.clear();
-        for (auto const& dataItem : data.weatherMonitorHistoricalData){
+        for (auto const& dataItem : weatherData.weatherMonitorHistoricalData){
             if(dataItem.CO2 == -1)continue;
             tileData.push_back(TileDataItem {
                 .timestamp =  dataItem.timestamp,
@@ -43,11 +44,11 @@ void DashboardScreen::show(PresentingData data){
             });
         }
         _co2Tile->setValues(tileData);
-        _co2Tile->setStatus(mapWarningLevelToTileStatus(data.CO2WarningLevel));
+        _co2Tile->setStatus(mapWarningLevelToTileStatus(weatherData.CO2WarningLevel));
 
         //PM_2_5
         tileData.clear();
-        for (auto const& dataItem : data.weatherMonitorHistoricalData){
+        for (auto const& dataItem : weatherData.weatherMonitorHistoricalData){
             if(dataItem.PM_2_5 == -1)continue;
             tileData.push_back(TileDataItem {
                 .timestamp =  dataItem.timestamp,
@@ -55,11 +56,11 @@ void DashboardScreen::show(PresentingData data){
             });
         }
         _PMTile->setValues(tileData);
-        _PMTile->setStatus(mapWarningLevelToTileStatus(data.PMWarningLevel));
+        _PMTile->setStatus(mapWarningLevelToTileStatus(weatherData.PMWarningLevel));
 
         //CH2O
         tileData.clear();
-        for (auto const& dataItem : data.weatherMonitorHistoricalData){
+        for (auto const& dataItem : weatherData.weatherMonitorHistoricalData){
             if(dataItem.CH2O == -1)continue;
             tileData.push_back(TileDataItem {
                 .timestamp =  dataItem.timestamp,
@@ -67,11 +68,21 @@ void DashboardScreen::show(PresentingData data){
             });
         }
         _ch2oTile->setValues(tileData);
-        _ch2oTile->setStatus(mapWarningLevelToTileStatus(data.CH2OWarningLevel));
+        _ch2oTile->setStatus(mapWarningLevelToTileStatus(weatherData.CH2OWarningLevel));
+    }
 
+    _co2Tile->redraw();
+    _PMTile->redraw();
+    _ch2oTile->redraw();
+}
+
+void DashboardScreen::showBackendWeatherData(PresentingBackendWeatherData backendWeatherData){
+    std::vector<TileDataItem> tileData(DATA_COLLECTION_CAPACITY);
+
+    if(backendWeatherData.backendWeatherHistoricalData.size() != 0){
         //temp
         tileData.clear();
-        for (auto const& dataItem : data.weatherMonitorHistoricalData){
+        for (auto const& dataItem : backendWeatherData.backendWeatherHistoricalData){
             tileData.push_back(TileDataItem {
                 .timestamp =  dataItem.timestamp,
                 .value =  dataItem.temperatureCelsium
@@ -81,17 +92,18 @@ void DashboardScreen::show(PresentingData data){
 
         //out PM2.5
         tileData.clear();
-        for (auto const& dataItem : data.weatherMonitorHistoricalData){
+        for (auto const& dataItem : backendWeatherData.backendWeatherHistoricalData){
+            if(dataItem.PM_2_5 == -1)continue;
             tileData.push_back(TileDataItem {
                 .timestamp =  dataItem.timestamp,
-                .value =  dataItem.humidityPercent
+                .value =  (float)dataItem.PM_2_5
             });
         }
         _outPMTile->setValues(tileData);
 
         //out Pressure
         tileData.clear();
-        for (auto const& dataItem : data.weatherMonitorHistoricalData){
+        for (auto const& dataItem : backendWeatherData.backendWeatherHistoricalData){
             tileData.push_back(TileDataItem {
                 .timestamp =  dataItem.timestamp,
                 .value =  dataItem.pressureInHPascals
@@ -100,9 +112,6 @@ void DashboardScreen::show(PresentingData data){
         _outPressureTile->setValues(tileData);
     }
 
-    _co2Tile->redraw();
-    _PMTile->redraw();
-    _ch2oTile->redraw();
     _outTempTile->redraw();
     _outPMTile->redraw();
     _outPressureTile->redraw();

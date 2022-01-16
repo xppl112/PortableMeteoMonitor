@@ -49,6 +49,7 @@ void TFTScreen::connect(){
     }
 
     _screen->init(_width, _height, _spiMode);
+    backLight();
     _isConnected = true;
 }
 
