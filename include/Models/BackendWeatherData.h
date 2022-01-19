@@ -3,7 +3,7 @@
 struct BackendWeatherData
 {
 public:
-    unsigned long timestamp;
+    long timestamp;
 
     int PM_2_5 = -1;
 

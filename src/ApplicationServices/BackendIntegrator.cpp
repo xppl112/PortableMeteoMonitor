@@ -51,13 +51,12 @@ void BackendIntegrator::requestWeatherData(){
         _backendWeatherHistoricalData.clear();
         BackendWeatherData wd;
         for (JsonObject dataItem : dataArray) {
-            long ts = ((millis()/1000) - (int)dataItem["ts"]) * 1000;
-            if(ts<0)wd.timestamp = 0;
-            else wd.timestamp = ts;
+            long ts = ((millis()/1000) - (long)dataItem["ts"]) * 1000;
+            wd.timestamp = ts;
             wd.PM_2_5 = dataItem["PM"];
             wd.temperatureCelsium = dataItem["to"];
             wd.humidityPercent = dataItem["ho"];
-            wd.pressureInHPascals = 2000.0+(float)dataItem["p"];
+            wd.pressureInHPascals = 1000.0+(float)dataItem["p"];
 
             _backendWeatherHistoricalData.push_back(wd);
         }

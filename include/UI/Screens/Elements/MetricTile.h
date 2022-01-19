@@ -9,7 +9,7 @@ enum class TileGraphColor { BLUE, PURPLE, GREEN, YELLOW, RED };
 struct TileDataItem
 {
 public:
-    unsigned long timestamp;
+    long timestamp;
     float value;
 };
 
@@ -65,7 +65,7 @@ private:
     String stringifyNumber(float number);
     String stringifyTimeInterval(int seconds);
  
-    static const uint16_t BackgroundColor = 0x18E3;
+    static const uint16_t BackgroundColor = 0x0000;
     static const uint16_t ScaleColor = 0x94B2;  
 
     static const uint16_t WarningBorderColor = 0xF5E7;

@@ -64,8 +64,8 @@ const uint8_t BUZZER_PIN = MCP_A1;
 const uint8_t LIGHT_SENSOR_PIN = A0;
 
 // BACKEND INTEGRATION
-#define WIFI_SSID "Sasha home"
-#define WIFI_PASSWORD "0672589600"
+#define WIFI_SSID "xppl"
+#define WIFI_PASSWORD "william2015"
 
 #define SERVER_HOST "http://weather.liashko.space"
 #define SERVER_API_GET_TIME "/api/time"

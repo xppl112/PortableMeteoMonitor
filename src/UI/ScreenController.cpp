@@ -14,7 +14,8 @@ ScreenController::ScreenController(HardwareRegistry* hardwareRegistry, Logger* l
 }
 
 void ScreenController::clearScreen(){
-    _screen->fillScreen(ST77XX_BLACK);
+    _screen->fillScreen(0x18E3);
+    _screen->fillRect(0,220,320,20,0x0000);
     _screen->setCursor(0, 0);
 }
 
@@ -75,13 +76,13 @@ void ScreenController::showMainButtons(bool blocked, bool isLedEnabled, bool isS
     CommonDrawFunctions::drawCenteredText(
         _screen, "mode", 6, buttonTextColor,15,79,230);
 
-    _screen->fillRect(81, 228, 77, 13, buttonBackgroundColor);
+    _screen->fillRect(81, 228, 78, 13, buttonBackgroundColor);
     CommonDrawFunctions::drawCenteredText(
-        _screen, "source", 6, buttonTextColor,81,158,230);
+        _screen, "source", 6, buttonTextColor,81,159,230);
 
-    _screen->fillRect(160, 228, 79, 13, buttonBackgroundColor);
+    _screen->fillRect(161, 228, 78, 13, buttonBackgroundColor);
     CommonDrawFunctions::drawCenteredText(
-        _screen, String("led ") + (isLedEnabled ? "on" : "off"), 6, buttonTextColor,160,239,230);
+        _screen, String("led ") + (isLedEnabled ? "on" : "off"), 6, buttonTextColor,161,239,230);
 
     _screen->fillRect(241, 228, 79, 13, buttonBackgroundColor);
     CommonDrawFunctions::drawCenteredText(

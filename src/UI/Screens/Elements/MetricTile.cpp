@@ -173,7 +173,7 @@ String MetricTile::stringifyNumber(float number){
 }
 
 String MetricTile::stringifyTimeInterval(int seconds){
-    if(seconds < 60 * 3)return "<" + String((int)(seconds/60)+1) + "m";
+    if(seconds < 60)return "<1m";
     if(seconds < 60 * 60)return "~" + String((int)(seconds/60)) + "m";
     if(seconds < 60 * 60 * 24)return "~" + String((int)(seconds/60/60)) + "h";
     return "~" + String((int)(seconds/60/60/24)) + "d";

@@ -5,27 +5,27 @@
 
 DashboardScreen::DashboardScreen(Adafruit_ST7789* screen){
     _screen = screen;
-    _co2Tile = new MetricTile(_screen,0,0,158,72,true);
+    _co2Tile = new MetricTile(_screen,0,0,159,72,true);
     _co2Tile->setupGraph(true, true, TileGraphColor::BLUE);
     _co2Tile->setTitle("CO2");
 
-    _PMTile = new MetricTile(_screen,0,74,158,72,true);
+    _PMTile = new MetricTile(_screen,0,74,159,72,true);
     _PMTile->setupGraph(true, true, TileGraphColor::BLUE);
     _PMTile->setTitle("PM2.5");
 
-    _ch2oTile = new MetricTile(_screen,0,148,158,72,true);
+    _ch2oTile = new MetricTile(_screen,0,148,159,72,true);
     _ch2oTile->setupGraph(true, true, TileGraphColor::BLUE);
     _ch2oTile->setTitle("CH2O");
 
-    _outTempTile = new MetricTile(_screen,160,0,158,72,true,1);
+    _outTempTile = new MetricTile(_screen,161,0,159,72,true,1);
     _outTempTile->setupGraph(true, true, TileGraphColor::PURPLE);
     _outTempTile->setTitle("out t");
 
-    _outPMTile = new MetricTile(_screen,160,74,158,72,true);
+    _outPMTile = new MetricTile(_screen,161,74,159,72,true);
     _outPMTile->setupGraph(true, true, TileGraphColor::PURPLE);
     _outPMTile->setTitle("out PM2.5");
 
-    _outPressureTile = new MetricTile(_screen,160,148,158,72,true);
+    _outPressureTile = new MetricTile(_screen,161,148,159,72,true);
     _outPressureTile->setupGraph(true, true, TileGraphColor::PURPLE);
     _outPressureTile->setTitle("out pressure");
 }
