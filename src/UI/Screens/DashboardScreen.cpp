@@ -100,6 +100,7 @@ void DashboardScreen::showBackendWeatherData(PresentingBackendWeatherData backen
             });
         }
         _outPMTile->setValues(tileData);
+        _outPMTile->setStatus(mapWarningLevelToTileStatus(backendWeatherData.PMWarningLevel));
 
         //out Pressure
         tileData.clear();

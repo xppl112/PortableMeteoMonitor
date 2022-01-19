@@ -66,8 +66,8 @@ void BackendIntegrator::requestWeatherData(){
                 .backendWeatherHistoricalData = _backendWeatherHistoricalData
             };
 
-            if(wd.PM_2_5 > PM2_5_LEVEL_ALERT) presentingBackendWeatherData.PMWarningLevel = WarningLevel::HI_WARNING_LEVEL;
-            else if(wd.PM_2_5 > PM2_5_LEVEL_WARNING) presentingBackendWeatherData.PMWarningLevel = WarningLevel::WARNING;
+            if(wd.PM_2_5 >= PM2_5_LEVEL_ALERT) presentingBackendWeatherData.PMWarningLevel = WarningLevel::HI_WARNING_LEVEL;
+            else if(wd.PM_2_5 >= PM2_5_LEVEL_WARNING) presentingBackendWeatherData.PMWarningLevel = WarningLevel::WARNING;
             else if(wd.PM_2_5 != -1)presentingBackendWeatherData.PMWarningLevel = WarningLevel::LOW_WARNING_LEVEL;
 
             _onUpdateCallback(presentingBackendWeatherData);
