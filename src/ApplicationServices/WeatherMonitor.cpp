@@ -34,14 +34,6 @@ void WeatherMonitor::updateTimers(){
     }
 }
 
-void WeatherMonitor::addUpdatedEventHandler(WeatherMonitorUpdatedEventCallback callback){
-    _onUpdateCallback = callback;
-}
-
-void WeatherMonitor::addBlockingEventHandler(BlockingEventCallback callback){
-    _onBlockingCallback = callback;
-}
-
 void WeatherMonitor::startMeasuring(){
     _airParticiplesSensor->beginMeasurement();
 }

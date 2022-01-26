@@ -18,8 +18,8 @@ public:
     WeatherMonitor(HardwareRegistry* hardwareRegistry, Logger* logger);
     void run();
     void updateTimers();
-    void addUpdatedEventHandler(WeatherMonitorUpdatedEventCallback callback);
-    void addBlockingEventHandler(BlockingEventCallback callback);
+    void addUpdatedEventHandler(WeatherMonitorUpdatedEventCallback callback){_onUpdateCallback = callback;}
+    void addBlockingEventHandler(BlockingEventCallback callback){_onBlockingCallback = callback;}
     void reconnectSensors();
     void resetSensors();
     enum class WeatherMonitorState {DISABLED, IDLE, MEASURING};

@@ -1,5 +1,4 @@
-#ifndef INPUTSCONTROLLER_H
-#define INPUTSCONTROLLER_H
+#pragma once
 
 #include "HardwareModules/HardwareRegistry.h"
 #include "HardwareModules/MCPExtender.h"
@@ -24,5 +23,3 @@ private:
 
     Button* registerButton(MCP* mcp, uint8_t buttonPin, bool isTouch = false);
 };
-
-#endif

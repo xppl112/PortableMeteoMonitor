@@ -8,18 +8,31 @@ UIController::UIController(HardwareRegistry* HardwareRegistry, Logger* logger)
     _ledIndicators = new LEDIndicatorsController(HardwareRegistry, logger);
     _soundController = new SoundController(HardwareRegistry, logger);
     _inputsController = new InputsController(HardwareRegistry, logger);
+    _menuController = new MenuController(HardwareRegistry);
 
     _timer = new Ticker(UI_REDRAW_INTERVAL_MS);
     _timer->start(true);
 
     //Draw splash data
-    onPresentingWeatherDataUpdate(_currentPresentingWeatherData);
-    onPresentingBackendWeatherDataUpdate(_currentPresentingBackendWeatherData);
+    showDataScreen();
     onNetworkStatusChange(NetworkStatus::DISABLED);
 }
 
 void UIController::updateUI() {
     updateInputs();
+    if(_currentView != View::MAIN_SCREEN){
+        _menuController->updateUI();
+        switch(_menuController->getStatus()){
+            case MenuStatus::FINISHED:
+                applyMenuChanges(_menuController->getCurrentOption());
+                showDataScreen();
+            break;
+            case MenuStatus::CANCELED:
+                showDataScreen();
+            break;
+            case MenuStatus::PENDING:break;
+        }
+    }
     
     _timer->update();
     if(_timer->state() == FIRED){
@@ -33,14 +46,20 @@ void UIController::updateInputs() {
 
     switch(buttonPressed){
         case ButtonPressed::TOUCH:
+            if(_currentView == View::MAIN_SCREEN) showMenuScreen(Menu::MODE_MENU);
+            else if(_currentView == View::MODE_MENU) _menuController->selectNextOption();
             break;
         case ButtonPressed::LEFT:
+            if(_currentView == View::MAIN_SCREEN) showMenuScreen(Menu::SOURCE_MENU);
+            else if(_currentView == View::SOURCE_MENU) _menuController->selectNextOption();
             break;
         case ButtonPressed::CENTER:
-            toggleLedEnabling();
+            if(_currentView == View::MAIN_SCREEN) toggleLedEnabling();
+            //else _menuController->modifyOption();
             break;
         case ButtonPressed::RIGHT:
-            toggleSoundEnabling();
+            if(_currentView == View::MAIN_SCREEN) toggleSoundEnabling();
+            else _menuController->cancel();
             break;
         case ButtonPressed::NONE:break;
     }
@@ -51,18 +70,22 @@ void UIController::onPresentingWeatherDataUpdate(PresentingWeatherData presentin
     
     if(_isLedEnabled)_ledIndicators->setWeatherStatus(_currentPresentingWeatherData);
     if(_isSoundEnabled)_soundController->setWarningLevel(_currentPresentingWeatherData.GetOverallWarningLevel());
-    _screen->showDataScreen(_currentView, _currentPresentingWeatherData);
     
-    drawInterface();
+    if(_currentView == View::MAIN_SCREEN){
+        _screen->showDataScreen(_currentSource, _currentPresentingWeatherData);    
+        drawInterface();
+    }
 }
 
 void UIController::onPresentingBackendWeatherDataUpdate(PresentingBackendWeatherData presentingBackendWeatherData){
     _currentPresentingBackendWeatherData = presentingBackendWeatherData;
     
     if(_isLedEnabled)_ledIndicators->setWeatherStatus(_currentPresentingBackendWeatherData);
-    _screen->showDataScreen(_currentView, _currentPresentingBackendWeatherData);
-    
-    drawInterface();
+
+    if(_currentView == View::MAIN_SCREEN){
+        _screen->showDataScreen(_currentSource, _currentPresentingBackendWeatherData);    
+        drawInterface();
+    }
 }
 
 void UIController::onNetworkStatusChange(NetworkStatus networkStatus){
@@ -75,7 +98,8 @@ void UIController::onBlocking(bool isBlocked){
 }
 
 void UIController::drawInterface(){
-    _screen->showMainButtons(_isBlocked, _isLedEnabled, _isSoundEnabled);
+    if(_currentView == View::MAIN_SCREEN)
+        _screen->showMainButtons(_isBlocked, _isLedEnabled, _isSoundEnabled);
 }
 
 void UIController::toggleLedEnabling(){
@@ -92,6 +116,36 @@ void UIController::toggleSoundEnabling(){
     _isSoundEnabled = !_isSoundEnabled;
     drawInterface();
     if(_isSoundEnabled){
-        _soundController->shortBeep();
+        _soundController->enableAlerting(_currentPresentingWeatherData.GetOverallWarningLevel());
+    }
+}
+
+void UIController::showMenuScreen(Menu menu){
+    if(menu == Menu::MODE_MENU){        
+        _currentView = View::MODE_MENU;
+        _menuController->showMenu(menu, (uint8_t)_currentRuntimePreferences.mode);
+    }
+    else if(menu == Menu::SOURCE_MENU){
+        _currentView = View::SOURCE_MENU;  
+        _menuController->showMenu(menu, (uint8_t)_currentSource);  
+    }
+}
+
+void UIController::showDataScreen(){
+    _currentView = View::MAIN_SCREEN;
+    onPresentingWeatherDataUpdate(_currentPresentingWeatherData);
+    onPresentingBackendWeatherDataUpdate(_currentPresentingBackendWeatherData);
+}
+
+void UIController::applyMenuChanges(uint8_t selectedOption){
+    if(_currentView == View::MODE_MENU){
+        if(selectedOption == (uint8_t)_currentRuntimePreferences.mode)return;
+        _currentRuntimePreferences.mode = (Mode)selectedOption;
+        if(_onRuntimePreferencesChangedCallback != NULL)_onRuntimePreferencesChangedCallback(_currentRuntimePreferences);
+    }
+    else if(_currentView == View::SOURCE_MENU){
+        if(selectedOption == (uint8_t)_currentSource)return;
+        _currentSource = (Source)selectedOption;
+        if(_onSourceChangedCallback != NULL)_onSourceChangedCallback(_currentSource);
     }
 }

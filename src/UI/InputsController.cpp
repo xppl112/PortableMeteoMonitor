@@ -4,11 +4,8 @@
 InputsController::InputsController(HardwareRegistry* hardwareRegistry, Logger* logger){
     _logger = logger;
     auto mcpExtender = hardwareRegistry->_MCPExtender;
-    if(!mcpExtender->isConnected()){
-        _logger->error("mcpExtender is not connected during initializing InputsController");
-    }
 
-    _touchButton = registerButton(mcpExtender->get(), TOUCH_BUTTON_PIN);
+    _touchButton = registerButton(mcpExtender->get(), TOUCH_BUTTON_PIN, true);
     _leftButton = registerButton(mcpExtender->get(), LEFT_BUTTON_PIN);
     _centerButton = registerButton(mcpExtender->get(), CENTER_BUTTON_PIN);
     _rightButton = registerButton(mcpExtender->get(), RIGHT_BUTTON_PIN);

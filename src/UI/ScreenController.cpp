@@ -1,6 +1,7 @@
 #include "UI/ScreenController.h"
 #include "StringUtils.h"
 #include "UI/Screens/CommonDrawFunctions.h"
+#include "UI/Screens/Elements/BottomButtons.h"
 #include "Config.h"
 
 ScreenController::ScreenController(HardwareRegistry* hardwareRegistry, Logger* logger){
@@ -14,7 +15,7 @@ ScreenController::ScreenController(HardwareRegistry* hardwareRegistry, Logger* l
 }
 
 void ScreenController::clearScreen(){
-    _screen->fillScreen(0x18E3);
+    _screen->fillScreen(ScreenBackgroundColor);
     _screen->fillRect(0,220,320,20,0x0000);
     _screen->setCursor(0, 0);
 }
@@ -23,16 +24,16 @@ void ScreenController::backlight(bool on){
     _screenDevice->backLight(on);
 }
 
-void ScreenController::showDataScreen(View view, PresentingWeatherData weatherData){
-    switch(view){
-        case View::MAIN_DASHBOARD:
+void ScreenController::showDataScreen(Source source, PresentingWeatherData weatherData){
+    switch(source){
+        case Source::MIXED_DATA:
             _dashboardScreen->showWeatherData(weatherData);
     }
 }
 
-void ScreenController::showDataScreen(View view, PresentingBackendWeatherData backendWeatherData){
-    switch(view){
-        case View::MAIN_DASHBOARD:
+void ScreenController::showDataScreen(Source source, PresentingBackendWeatherData backendWeatherData){
+    switch(source){
+        case Source::MIXED_DATA:
             _dashboardScreen->showBackendWeatherData(backendWeatherData);
     }
 }
@@ -68,23 +69,6 @@ void ScreenController::showNetworkStatusIcon(NetworkStatus status){
 }
 
 void ScreenController::showMainButtons(bool blocked, bool isLedEnabled, bool isSoundEnabled){
-    _screen->drawLine(0, 225, 320, 225, MainButtonsDividerColor);
-    uint16_t buttonBackgroundColor = blocked ? MainButtonsDisabledBackground : MainButtonsBackground;
-    uint16_t buttonTextColor = blocked ? MainButtonsDisabledTextColor : MainButtonsDefaultTextColor;
-
-    _screen->fillRect(15, 228, 64, 13, buttonBackgroundColor);
-    CommonDrawFunctions::drawCenteredText(
-        _screen, "mode", 6, buttonTextColor,15,79,230);
-
-    _screen->fillRect(81, 228, 78, 13, buttonBackgroundColor);
-    CommonDrawFunctions::drawCenteredText(
-        _screen, "source", 6, buttonTextColor,81,159,230);
-
-    _screen->fillRect(161, 228, 78, 13, buttonBackgroundColor);
-    CommonDrawFunctions::drawCenteredText(
-        _screen, String("led ") + (isLedEnabled ? "on" : "off"), 6, buttonTextColor,161,239,230);
-
-    _screen->fillRect(241, 228, 79, 13, buttonBackgroundColor);
-    CommonDrawFunctions::drawCenteredText(
-        _screen, String("sound ") + (isSoundEnabled ? "on" : "off"), 6, buttonTextColor,241,320,230);
+    BottomButtons bottomButtons(_screen);
+    bottomButtons.showMainScreenButtons(blocked, isLedEnabled, isSoundEnabled);
 }

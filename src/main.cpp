@@ -1,5 +1,6 @@
 #include <config.h>
 #include "Log4Esp.h"
+#include "GlobalObjects/GlobalState.h"
 #include "ApplicationServices/WeatherMonitor.h"
 #include "ApplicationServices/BackendIntegrator.h"
 #include "ApplicationServices/UIController.h"
@@ -14,6 +15,8 @@ void onPresentingWeatherDataUpdateEventHandler(PresentingWeatherData PresentingW
 void onPresentingBackendWeatherDataUpdateEventHandler(PresentingBackendWeatherData PresentingBackendWeatherData);
 void onNetworkStatusChangeEventHandler(NetworkStatus networkStatus);
 void onBlockingEventHandler(bool isBlocked);
+void onRuntimePreferencesChangedEventHandler(RuntimePreferences runtimePreferences);
+void onSourceChangedEventHandler(Source source);
 
 void setup() {
     Serial.begin(9600);
@@ -22,9 +25,12 @@ void setup() {
     hardwareRegistry = new HardwareRegistry(logger);
     hardwareRegistry->reconnectAllDisconnectedDevices();
 
-    uiController = new UIController(hardwareRegistry, logger);
     weatherMonitor = new WeatherMonitor(hardwareRegistry, logger);
     backendIntegrator = new BackendIntegrator(logger);
+
+    uiController = new UIController(hardwareRegistry, logger);
+    uiController->addRuntimePreferencesChangedEventHandler(onRuntimePreferencesChangedEventHandler);
+    uiController->addSourceChangedEventHandler(onSourceChangedEventHandler);
 
     weatherMonitor->addUpdatedEventHandler(onPresentingWeatherDataUpdateEventHandler);
     weatherMonitor->addBlockingEventHandler(onBlockingEventHandler);
@@ -32,6 +38,7 @@ void setup() {
 
     backendIntegrator->addUpdatedEventHandler(onPresentingBackendWeatherDataUpdateEventHandler);
     backendIntegrator->addNetworkStatusChangedEventHandler(onNetworkStatusChangeEventHandler);
+    backendIntegrator->addBlockingEventHandler(onBlockingEventHandler);
     backendIntegrator->run();
 }
 
@@ -57,4 +64,12 @@ void onNetworkStatusChangeEventHandler(NetworkStatus networkStatus){
 
 void onBlockingEventHandler(bool isBlocked){
     uiController->onBlocking(isBlocked);
+}
+
+void onRuntimePreferencesChangedEventHandler(RuntimePreferences runtimePreferences){
+    
+}
+
+void onSourceChangedEventHandler(Source source){
+    
 }

@@ -1,8 +1,10 @@
+#pragma once
+
 #include "HardwareModules/HardwareRegistry.h"
 #include "HardwareModules/TFTScreen.h"
 #include "Models/PresentingWeatherData.h"
 #include "Models/Enums/NetworkStatus.h"
-#include "Models/Enums/View.h"
+#include "Models/Enums/Source.h"
 #include "Log4Esp.h"
 
 #include "UI/Screens/DashboardScreen.h"
@@ -13,8 +15,8 @@ public:
     ScreenController(HardwareRegistry* hardwareRegistry, Logger* logger);
     void clearScreen();
     void backlight(bool on);
-    void showDataScreen(View view, PresentingWeatherData weatherData);
-    void showDataScreen(View view, PresentingBackendWeatherData backendWeatherData);    
+    void showDataScreen(Source source, PresentingWeatherData weatherData);
+    void showDataScreen(Source source, PresentingBackendWeatherData backendWeatherData);    
     void showNetworkStatusIcon(NetworkStatus status);
     void showMainButtons(bool blocked, bool isLedEnabled, bool isSoundEnabled);
 
@@ -25,11 +27,7 @@ private:
 
     DashboardScreen* _dashboardScreen;
 
-    static const uint16_t MainButtonsDividerColor = 0x3186;
-    static const uint16_t MainButtonsBackground = 0x3186;
-    static const uint16_t MainButtonsDefaultTextColor = 0xAD75;
-    static const uint16_t MainButtonsDisabledBackground = 0x58E3;
-    static const uint16_t MainButtonsDisabledTextColor = 0x8AEB;
+    static const uint16_t ScreenBackgroundColor = 0x18E3;
 
     static const uint16_t WifiDisabledIconBackgroundColor = 0x3186;
     static const uint16_t WifiDisabledIconSymbolColor = 0xAD75;

@@ -22,6 +22,19 @@ void CommonDrawFunctions::drawCenteredText(
         _screen->print(text);
 }
 
+void CommonDrawFunctions::drawText(Adafruit_ST7789* _screen,
+    String text, uint8_t fontSize, uint16_t textColor,
+    uint16_t x, uint16_t y){
+        _screen->setTextSize(1);
+        if(fontSize == 6)_screen->setFont(NULL);
+        else if(fontSize == 9)_screen->setFont(&FreeSans9pt7b);
+        else if(fontSize == 18)_screen->setFont(&FreeSansBold18pt7b);
+        
+        _screen->setTextColor(textColor);
+        _screen->setCursor(x+1,y+1);
+        _screen->print(text);
+}
+
 uint16_t CommonDrawFunctions::getTextWidth(Adafruit_ST7789* _screen, String text){
     int16_t xBound, yBound; uint16_t widthBound, heightBound;
     _screen->getTextBounds(text, 0, 0, &xBound, &yBound, &widthBound, &heightBound);

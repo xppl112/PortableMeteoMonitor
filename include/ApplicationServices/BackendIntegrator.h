@@ -10,6 +10,7 @@
 
 typedef void (*BackendWeatherUpdatedEventCallback)(PresentingBackendWeatherData);
 typedef void (*BackendNetworkStatusChangedEventCallback)(NetworkStatus);
+typedef void (*BlockingEventCallback)(bool);
 
 class BackendIntegrator
 {
@@ -18,8 +19,9 @@ public:
     void run();
     void stop();
     void updateTimers();
-    void addUpdatedEventHandler(BackendWeatherUpdatedEventCallback callback);
-    void addNetworkStatusChangedEventHandler(BackendNetworkStatusChangedEventCallback callback);
+    void addUpdatedEventHandler(BackendWeatherUpdatedEventCallback callback){_onUpdateCallback = callback;}
+    void addNetworkStatusChangedEventHandler(BackendNetworkStatusChangedEventCallback callback){_onNetworkStatusChangeCallback = callback;}
+    void addBlockingEventHandler(BlockingEventCallback callback){_onBlockingCallback = callback;}
 
     bool IsConnected = false;
 
@@ -29,10 +31,12 @@ private:
     void disconnectWifi();
 
     Logger* _logger;
-    BackendWeatherUpdatedEventCallback _onUpdateCallback;
-    BackendNetworkStatusChangedEventCallback _onNetworkStatusChangeCallback;
     Ticker* _timer;
     std::vector<BackendWeatherData> _backendWeatherHistoricalData;
+
+    BackendWeatherUpdatedEventCallback _onUpdateCallback;
+    BackendNetworkStatusChangedEventCallback _onNetworkStatusChangeCallback;
+    BlockingEventCallback _onBlockingCallback;
 
     EspWifiClient* _esp;
 };

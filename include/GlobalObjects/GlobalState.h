@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include "Models/Enums/Mode.h"
+#include "Models/Enums/Source.h"
 
 class GlobalState {    
 public:
@@ -10,7 +11,7 @@ public:
     }
 
     volatile Mode mode = Mode::STANDARD;
-    volatile bool isNightMode = false;
+    volatile Source source = Source::MIXED_DATA;
 
     unsigned long getCurrentTimestamp(){
         if(_timeStampSnapshot == 0) return 0;

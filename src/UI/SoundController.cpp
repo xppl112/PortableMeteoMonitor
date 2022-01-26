@@ -17,6 +17,11 @@ void SoundController::setWarningLevel(WarningLevel level){
     _lastWarningLevel = level;
 }
 
+void SoundController::enableAlerting(WarningLevel currentLevel){
+    _lastWarningLevel = currentLevel;
+    shortBeep();
+}
+
 void SoundController::shortBeep(uint8_t count){
     _buzzerModule->beep(count, 200, 200);
 }

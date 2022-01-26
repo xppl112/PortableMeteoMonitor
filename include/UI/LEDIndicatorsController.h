@@ -1,3 +1,5 @@
+#pragma once
+
 #include "HardwareModules/HardwareRegistry.h"
 #include "HardwareModules/MCPExtender.h"
 #include "Models/PresentingWeatherData.h"

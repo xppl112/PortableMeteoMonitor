@@ -24,24 +24,21 @@ void BackendIntegrator::updateTimers(){
     }
 }
 
-void BackendIntegrator::addUpdatedEventHandler(BackendWeatherUpdatedEventCallback callback){
-    _onUpdateCallback = callback;
-}
-
-void BackendIntegrator::addNetworkStatusChangedEventHandler(BackendNetworkStatusChangedEventCallback callback)
-{
-    _onNetworkStatusChangeCallback = callback;
-}
-
 void BackendIntegrator::requestWeatherData(){
-    if(!connectWifi())return;
-    _onNetworkStatusChangeCallback(NetworkStatus::ACTIVE);
-
+    if(_onBlockingCallback != NULL)_onBlockingCallback(true);
+    if(_onNetworkStatusChangeCallback != NULL)_onNetworkStatusChangeCallback(NetworkStatus::ACTIVE);
+    
+    if(!connectWifi()){
+        if(_onNetworkStatusChangeCallback != NULL)_onNetworkStatusChangeCallback(NetworkStatus::PROBLEM);
+        if(_onBlockingCallback != NULL)_onBlockingCallback(false);
+        return;
+    }
+    
     HttpResponse response = _esp->sendGetRequest(
         SERVER_HOST, String(SERVER_API_GET_OUTDOOR_WEATHER) + "?c=" + String(DATA_COLLECTION_CAPACITY));
 
     if(response.success && response.statusCode == 200){
-        _onNetworkStatusChangeCallback(NetworkStatus::STANDBY);
+        if(_onNetworkStatusChangeCallback != NULL)_onNetworkStatusChangeCallback(NetworkStatus::STANDBY);
 
         DynamicJsonDocument jsonDoc(3000);
         deserializeJson(jsonDoc, response.payload);
@@ -74,16 +71,13 @@ void BackendIntegrator::requestWeatherData(){
         }
     }
     else _onNetworkStatusChangeCallback(NetworkStatus::PROBLEM);
+    
+    if(_onBlockingCallback != NULL)_onBlockingCallback(false);
 }
 
 bool BackendIntegrator::connectWifi(){
     if(!IsConnected || !_esp->isWifiConnected()){
-        _onNetworkStatusChangeCallback(NetworkStatus::ACTIVE);
-
         IsConnected = _esp->connectWifi(WIFI_SSID, WIFI_PASSWORD);
-
-        if(IsConnected) _onNetworkStatusChangeCallback(NetworkStatus::STANDBY);
-        else _onNetworkStatusChangeCallback(NetworkStatus::PROBLEM);
     }
 
     return IsConnected;
