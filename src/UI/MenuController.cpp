@@ -7,51 +7,58 @@ MenuController::MenuController(HardwareRegistry* hardwareRegistry){
     _screen = hardwareRegistry->_TFTScreen->get();
     _menuScreen = new MenuScreen(_screen);
 
-    _timer = new Ticker(1000, NULL, MILLIS); 
+    _timer = new Ticker(AcceptingDelayStepMs, NULL, MILLIS); 
 }
 
 void MenuController::showMenu(Menu menu, uint8_t selectedOption){
     _currentMenu = menu;
     _currentOption = selectedOption;
     _status = MenuStatus::PENDING;
-    _currentAcceptingDelay = 0;
-    redraw();
+    _currentAcceptingDelayStep = 0;
     drawBottomButtons();
+    redraw();    
 
     _timer->start();
 }
 
-void MenuController::redraw(bool onlyDelayPointers){
-    if(onlyDelayPointers)_menuScreen->updateDelayStatus(_currentAcceptingDelay * 100 / AcceptingDelaySeconds);
-    else {
-        if(_currentMenu == Menu::MODE_MENU)_menuScreen->drawMenu(_modeMenuItemLabels, _modeMenuItemLabels->length(),_currentOption);
-        else if(_currentMenu == Menu::SOURCE_MENU)_menuScreen->drawMenu(_sourceMenuItemLabels, _sourceMenuItemLabels->length(),_currentOption);
-    }
+void MenuController::redraw(){
+    if(_currentMenu == Menu::MODE_MENU)_menuScreen->drawMenu("Mode:", _modeMenuItemLabels, 3,_currentOption);
+    else if(_currentMenu == Menu::SOURCE_MENU)_menuScreen->drawMenu("Source:", _sourceMenuItemLabels, 4,_currentOption);
+}
+
+void MenuController::redrawOption(uint8_t option, bool isSelected){
+    if(_currentMenu == Menu::MODE_MENU)_menuScreen->redrawOption(option, _modeMenuItemLabels[option], isSelected);
+    else if(_currentMenu == Menu::SOURCE_MENU)_menuScreen->redrawOption(option, _sourceMenuItemLabels[option], isSelected);    
+}
+
+void MenuController::redrawDelayPointers(){
+    _menuScreen->updateDelayStatus(_currentOption, _currentAcceptingDelayStep * 100 / AcceptingDelaySteps);
 }
 
 void MenuController::updateUI(){
     _timer->update();
     if(_timer->state() == FIRED){
-        _currentAcceptingDelay++;
-        if(_currentAcceptingDelay == AcceptingDelaySeconds)_status = MenuStatus::FINISHED;
-        else redraw(true);
+        _currentAcceptingDelayStep++;
+        if(_currentAcceptingDelayStep == AcceptingDelaySteps)_status = MenuStatus::FINISHED;
+        redrawDelayPointers();
         _timer->start();
     }
 }
 
 void MenuController::selectNextOption(){
+    redrawOption(_currentOption, false);
     _currentOption++;
-    if(_currentMenu == Menu::MODE_MENU && _currentOption == _modeMenuItemLabels->length())_currentOption = 0;
-    else if(_currentMenu == Menu::SOURCE_MENU && _currentOption == _sourceMenuItemLabels->length())_currentOption = 0;
-    
-    redraw();
-    _currentAcceptingDelay = 0;
+    if(_currentMenu == Menu::MODE_MENU && _currentOption == 3)_currentOption = 0;
+    else if(_currentMenu == Menu::SOURCE_MENU && _currentOption == 4)_currentOption = 0; 
+    redrawOption(_currentOption, true);
+
+    _currentAcceptingDelayStep = 0;
     _timer->start();
 }
 
 void MenuController::modifyOption(){    
-    redraw();
-    _currentAcceptingDelay = 0;
+    redrawOption(_currentOption, true);
+    _currentAcceptingDelayStep = 0;
     _timer->start();
 }
 

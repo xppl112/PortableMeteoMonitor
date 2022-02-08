@@ -2,8 +2,7 @@
 #include "UI/LEDIndicatorsController.h"
 #include "Config.h"
 
-LEDIndicatorsController::LEDIndicatorsController(HardwareRegistry* hardwareRegistry, Logger* logger){
-    _logger = logger;
+LEDIndicatorsController::LEDIndicatorsController(HardwareRegistry* hardwareRegistry){
     auto mcpExtender = hardwareRegistry->_MCPExtender;
 
     _topLed = new McpRGBLed(mcpExtender->get(), LED_TOP_RGB_R, LED_TOP_RGB_G, LED_TOP_RGB_B, false);

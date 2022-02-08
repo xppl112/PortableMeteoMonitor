@@ -1,10 +1,9 @@
 #include "ApplicationServices/BackendIntegrator.h"
 #include <ArduinoJson.h>
 
-BackendIntegrator::BackendIntegrator(Logger* logger){
-    _logger = logger;
+BackendIntegrator::BackendIntegrator(){
     _esp = new EspWifiClient();
-    _timer = new Ticker(BACKEND_REFRESH_INTERVAL_SECONDS * 1000);
+    _timer = new Ticker(_backendRefreshIntervalSeconds * 1000);
 }
 
 void BackendIntegrator::run(){
@@ -40,7 +39,7 @@ void BackendIntegrator::requestWeatherData(){
     if(response.success && response.statusCode == 200){
         if(_onNetworkStatusChangeCallback != NULL)_onNetworkStatusChangeCallback(NetworkStatus::STANDBY);
 
-        DynamicJsonDocument jsonDoc(3000);
+        DynamicJsonDocument jsonDoc(4000);
         deserializeJson(jsonDoc, response.payload);
         //unsigned long currentTimestamp = jsonDoc["cts"];
         JsonArray dataArray = jsonDoc["data"].as<JsonArray>();
@@ -54,6 +53,8 @@ void BackendIntegrator::requestWeatherData(){
             wd.temperatureCelsium = dataItem["to"];
             wd.humidityPercent = dataItem["ho"];
             wd.pressureInHPascals = 1000.0+(float)dataItem["p"];
+            wd.temperatureBalconyCelsium = dataItem["tb"];
+            wd.humidityBalconyPercent = dataItem["hb"];
 
             _backendWeatherHistoricalData.push_back(wd);
         }
@@ -85,4 +86,18 @@ bool BackendIntegrator::connectWifi(){
 void BackendIntegrator::disconnectWifi(){
     _esp->disconnectWifi();
     _onNetworkStatusChangeCallback(NetworkStatus::DISABLED);
+}
+
+void BackendIntegrator::setRefreshMode(Mode mode){
+    switch(mode){
+        case Mode::STANDARD:
+        case Mode::ACTIVE_MONITORING:
+            _backendRefreshIntervalSeconds = DEFAULT_BACKEND_REFRESH_INTERVAL_SECONDS;
+            break;
+        case Mode::NIGHT:
+            _backendRefreshIntervalSeconds = NIGHT_BACKEND_REFRESH_INTERVAL_SECONDS;
+            break;
+    };
+    _timer->interval(_backendRefreshIntervalSeconds * 1000);
+    if(IsConnected)_timer->start();
 }

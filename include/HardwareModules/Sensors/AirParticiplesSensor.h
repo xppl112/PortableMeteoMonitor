@@ -32,8 +32,9 @@ public:
     void reset() override;
     bool isConnected() override { _isConnected = _sensor->isConnected; return _isConnected; }
     
-    void beginMeasurement();
-    AirParticiplesSensorData endMeasurement();
+    void wakeUp();
+    void sleep();
+    AirParticiplesSensorData getData();
 
 private:
     PlantowerSensor* _sensor;

@@ -2,8 +2,7 @@
 #include "UI/SoundController.h"
 #include "Config.h"
 
-SoundController::SoundController(HardwareRegistry* hardwareRegistry, Logger* logger){
-    _logger = logger;
+SoundController::SoundController(HardwareRegistry* hardwareRegistry){
     _buzzerModule = hardwareRegistry->_buzzerModule;
     _buzzerModule->connect();
 }

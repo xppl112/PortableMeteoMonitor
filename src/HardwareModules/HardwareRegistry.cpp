@@ -2,8 +2,7 @@
 #include "Config.h"
 #include "HardwareModules/HardwareRegistry.h"
 
-HardwareRegistry::HardwareRegistry(Logger* logger){    
-    _logger = logger;
+HardwareRegistry::HardwareRegistry(){    
     _timer = new Ticker(HEALTHCHECK_INTERVAL_MS);
     _timer->start(true);
 

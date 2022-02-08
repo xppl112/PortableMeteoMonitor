@@ -1,8 +1,7 @@
 #include "UI/InputsController.h"
 #include "Config.h"
 
-InputsController::InputsController(HardwareRegistry* hardwareRegistry, Logger* logger){
-    _logger = logger;
+InputsController::InputsController(HardwareRegistry* hardwareRegistry){
     auto mcpExtender = hardwareRegistry->_MCPExtender;
 
     _touchButton = registerButton(mcpExtender->get(), TOUCH_BUTTON_PIN, true);

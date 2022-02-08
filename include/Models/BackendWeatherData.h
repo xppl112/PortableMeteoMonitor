@@ -10,4 +10,7 @@ public:
     float temperatureCelsium;
     float humidityPercent;
     float pressureInHPascals;
+
+    float temperatureBalconyCelsium;
+    float humidityBalconyPercent;
 };

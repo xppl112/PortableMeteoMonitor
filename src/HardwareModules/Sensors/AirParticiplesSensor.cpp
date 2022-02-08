@@ -17,14 +17,21 @@ void AirParticiplesSensor::reset(){
     connect();
 }
 
-void AirParticiplesSensor::beginMeasurement(){
+void AirParticiplesSensor::sleep(){
     if(!_sensor->isConnected)
         return;
 
-    _sensor->wakeUp();
+    if(!_sensor->isInSleepMode)_sensor->sleep();
 }
 
-AirParticiplesSensorData AirParticiplesSensor::endMeasurement(){
+void AirParticiplesSensor::wakeUp(){
+    if(!_sensor->isConnected)
+        return;
+
+    if(_sensor->isInSleepMode)_sensor->wakeUp();
+}
+
+AirParticiplesSensorData AirParticiplesSensor::getData(){
     _serial->listen();
     auto pmsData = _sensor->readData();
     this->registerDataFetching(pmsData.isDataReceived);
@@ -35,6 +42,5 @@ AirParticiplesSensorData AirParticiplesSensor::endMeasurement(){
     data.PM_2_5 = pmsData.PM_2_5;
     data.PM_10_0 = pmsData.PM_10_0;
 
-    _sensor->sleep();
     return data;
 }

@@ -16,7 +16,9 @@ public:
     MenuStatus getStatus() {return _status;}
     uint8_t getCurrentOption() {return _currentOption;}
     void updateUI();
-    void redraw(bool onlyDelayPointers = false);
+    void redraw();
+    void redrawOption(uint8_t option, bool isSelected);
+    void redrawDelayPointers();
 
     void selectNextOption();
     void modifyOption();
@@ -28,13 +30,14 @@ private:
     Ticker* _timer;
 
     Menu _currentMenu;
-    MenuStatus _status = MenuStatus::PENDING;
+    volatile MenuStatus _status = MenuStatus::PENDING;
     uint8_t _currentOption;
     
     void drawBottomButtons();
 
     String _modeMenuItemLabels[3]{"Standard mode","Active monitoring", "Night mode"};
     String _sourceMenuItemLabels[4]{"Mixed data","Local data","Out weather","Solar station"};
-    const uint8_t AcceptingDelaySeconds = 5;
-    uint8_t _currentAcceptingDelay = 0;
+    const uint16_t AcceptingDelayStepMs = 25;
+    const uint8_t AcceptingDelaySteps = 80;
+    uint8_t _currentAcceptingDelayStep = 0;
 };

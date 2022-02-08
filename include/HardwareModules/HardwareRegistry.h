@@ -4,7 +4,6 @@
 #include "HardwareModules/IHardwareModule.h"
 #include <stdint.h>
 #include <Ticker.h>
-#include "Log4Esp.h"
 
 #include "HardwareModules/Sensors/AirParticiplesSensor.h"
 #include "HardwareModules/Sensors/CH2OSensor.h"
@@ -18,7 +17,7 @@
 class HardwareRegistry
 {
 public:
-    HardwareRegistry(Logger* logger);
+    HardwareRegistry();
 
     void healthCheck();
     void reconnectAllDisconnectedDevices();
@@ -33,7 +32,6 @@ public:
     BuzzerModule *_buzzerModule;
 
 private:
-    Logger* _logger;
     Ticker* _timer;
 
     void initializeDevices();

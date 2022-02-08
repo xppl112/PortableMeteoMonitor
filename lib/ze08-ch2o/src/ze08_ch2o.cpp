@@ -34,9 +34,7 @@ bool Ze08CH2O::getGasConcentration(concentration_t& value)
 	available_ = false;
 	_concentration = _ppb = 0;
 
-	if(_mode == MODE_PASSIVE){
-		Serial.println("Sending request");
-		
+	if(_mode == MODE_PASSIVE){		
 		uint8_t command[] = {0xFF, 0x01, 0x86, 0x00, 0x00, 0x00, 0x00, 0x00, 0x79};
 		for(uint8_t i = 0; i < (uint8_t)sizeof(command); i++)
 		{
@@ -70,10 +68,9 @@ void Ze08CH2O::passiveReadLoop()
   if (stream_->available() > 0)
   {
     uint8_t ch = stream_->read();
-Serial.print(ch);Serial.print(" ");
+
 	switch (state) {
 	case STATE_START:
-		Serial.println("STATE_START ");
 		if (ch == 0xFFu) {
 			dataSum = 0;
 			state = STATE_PASSIVE_COMMAND;
@@ -81,30 +78,24 @@ Serial.print(ch);Serial.print(" ");
 		}
 		break;
 	case STATE_PASSIVE_COMMAND:
-		Serial.println("STATE_PASSIVE_COMMAND ");
 		if (ch != 0x86) {
 			resetState();
 			return;
 		}
 		break;
 	case STATE_PASSIVE_CONCENTRATION_HI:
-		Serial.println("STATE_PASSIVE_CONCENTRATION_HI ");
 		_concentration = ch << 8;
 		break;
 	case STATE_PASSIVE_CONCENTRATION_LO:
-		Serial.println("STATE_PASSIVE_CONCENTRATION_LO ");
 		_concentration |= ch;
 		break;
 	case STATE_PASSIVE_PPB_HI:
-		Serial.println("STATE_PASSIVE_PPB_HI ");
 		_ppb = ch << 8;
 		break;
 	case STATE_PASSIVE_PPB_LO:
-		Serial.println("STATE_PASSIVE_PPB_LO ");
 		_ppb |= ch;
 		break;
 	case STATE_CHECKSUM:
-		Serial.println("STATE_CHECKSUM ");
 		unsigned char finalEcksum  = (~dataSum)+1 ;
 		if (finalEcksum   == ch ) {
 				available_ = true;

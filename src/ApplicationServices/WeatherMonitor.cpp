@@ -1,9 +1,7 @@
 #include "ApplicationServices/WeatherMonitor.h"
 #include "Config.h"
 
-WeatherMonitor::WeatherMonitor(HardwareRegistry* hardwareRegistry, Logger* logger){
-    _logger = logger;
-    
+WeatherMonitor::WeatherMonitor(HardwareRegistry* hardwareRegistry){
     _airParticiplesSensor = hardwareRegistry->_airParticiplesSensor;
     _CH2OSensor = hardwareRegistry->_CH2OSensor;
     _CO2Sensor = hardwareRegistry->_CO2Sensor;
@@ -17,35 +15,41 @@ void WeatherMonitor::run(){
     _timer->start(true);
 }
 
+void WeatherMonitor::stop(){
+    _timer->stop();
+    _airParticiplesSensor->sleep();
+}
+
 void WeatherMonitor::updateTimers(){
     _timer->update();
     if(_timer->state() == FIRED){
         if(state == WeatherMonitorState::IDLE){
             startMeasuring();
             state = WeatherMonitorState::MEASURING;
-            _timer->interval(DEFAULT_MEASUREMENT_DURATION_SECONDS * 1000);
+            _timer->interval(_measurementDurationSeconds * 1000);
         }
         else if(state == WeatherMonitorState::MEASURING){
             finishMeasuring();
             state = WeatherMonitorState::IDLE;   
-            _timer->interval(DEFAULT_CALMDOWN_DURATION_SECONDS * 1000);
+            _timer->interval(_calmdownDurationSeconds * 1000);
         }
         _timer->start();
     }
 }
 
 void WeatherMonitor::startMeasuring(){
-    _airParticiplesSensor->beginMeasurement();
+    _airParticiplesSensor->wakeUp();
 }
 
-void WeatherMonitor::finishMeasuring(bool runWithoutStart){
+void WeatherMonitor::finishMeasuring(){
     WeatherMonitorData data;
     data.timestamp = millis();
 
     if(_onBlockingCallback != NULL)_onBlockingCallback(true);
 
     AirParticiplesSensorData airParticiplesData;
-    if(!runWithoutStart)airParticiplesData = _airParticiplesSensor->endMeasurement();
+    airParticiplesData = _airParticiplesSensor->getData();
+    if(_calmdownDurationSeconds != 0)_airParticiplesSensor->sleep();
 
     auto ch2oData = _CH2OSensor->getData();
     auto co2Data = _CO2Sensor->getData();
@@ -99,6 +103,33 @@ void WeatherMonitor::registerWeatherData(WeatherMonitorData data){
         else if(data.CH2O >= CH2O_LEVEL_WARNING) PresentingWeatherData.CH2OWarningLevel = WarningLevel::WARNING;
         else if(data.CH2O != -1)PresentingWeatherData.CH2OWarningLevel = WarningLevel::LOW_WARNING_LEVEL;
 
-         _onUpdateCallback(PresentingWeatherData);
+        _onUpdateCallback(PresentingWeatherData);
+    }
+}
+
+void WeatherMonitor::setMeasurementMode(Mode mode){
+    switch(mode){
+        case Mode::STANDARD:
+            _measurementDurationSeconds = DEFAULT_MEASUREMENT_DURATION_SECONDS;
+            _calmdownDurationSeconds = DEFAULT_CALMDOWN_DURATION_SECONDS;
+            break;
+        case Mode::ACTIVE_MONITORING:
+            _measurementDurationSeconds = ACTIVE_MEASUREMENT_DURATION_SECONDS;
+            _calmdownDurationSeconds = ACTIVE_CALMDOWN_DURATION_SECONDS;
+            break;
+        case Mode::NIGHT:
+            _measurementDurationSeconds = NIGHT_MEASUREMENT_DURATION_SECONDS;
+            _calmdownDurationSeconds = NIGHT_CALMDOWN_DURATION_SECONDS;
+            break;
+    };
+
+    state = WeatherMonitorState::IDLE;
+    _timer->start(true);
+    _weatherMonitorHistoricalData.clear();
+    if(_onUpdateCallback != NULL){
+        PresentingWeatherData PresentingWeatherData {
+            .weatherMonitorHistoricalData = _weatherMonitorHistoricalData
+        };
+        _onUpdateCallback(PresentingWeatherData);
     }
 }

@@ -8,13 +8,13 @@
 MetricTile::MetricTile(
     Adafruit_ST7789* screen, 
     uint16_t x, uint16_t y, uint16_t width, uint16_t height, 
-    bool displayRefreshTime, uint8_t decimalCount){
+    bool displayLeftTimeMarker, uint8_t decimalCount){
         _screen = screen;
         _x = x;
         _y = y;
         _width = width;
         _height = height;
-        _displayRefreshTime = displayRefreshTime;
+        _displayLeftTimeMarker = displayLeftTimeMarker;
         _decimalCount = decimalCount;
 }
 
@@ -22,11 +22,13 @@ void MetricTile::setupGraph(
     bool displayGraph, 
     bool displayScale, 
     TileGraphColor graphColor, 
-    bool changeColorByStatus){
+    bool changeColorByStatus,
+    bool showTimeGaps){
         _displayGraph = displayGraph;
         _displayScale = displayScale;
         _initialGraphColor = _currentGraphColor = graphColor;
         _changeGraphColorByStatus = changeColorByStatus;
+        _showTimeGaps = showTimeGaps;
 }
 
 void MetricTile::setValues(std::vector<TileDataItem> values){
@@ -52,8 +54,11 @@ void MetricTile::redraw(bool fullRedraw){
 
         auto refreshRateSeconds = calculateRefreshRate();
         float graphStepWidth = (float)_width / (float)DATA_COLLECTION_CAPACITY;
-        uint8_t graphXPositionOffset = (millis() - _values.back().timestamp) / 1000 * graphStepWidth / refreshRateSeconds;
-        if(graphXPositionOffset > graphStepWidth)graphXPositionOffset = graphStepWidth;
+        uint8_t graphXPositionOffset = 0;
+        if(_showTimeGaps){
+            graphXPositionOffset = (millis() - _values.back().timestamp) / 1000 * graphStepWidth / refreshRateSeconds;
+            if(graphXPositionOffset > graphStepWidth)graphXPositionOffset = graphStepWidth;
+        }
         float graphXPosition = (float)_width + (float)_x - (float)graphXPositionOffset;
 
         uint16_t previousGraphStepX = graphXPosition;
@@ -109,14 +114,14 @@ void MetricTile::redraw(bool fullRedraw){
             _screen->drawLine(_x + _width - 4, _y + 57, _x + _width -1, _y + 57, ScaleColor);
         }
     }
-    //Refresh time
-    if(_displayRefreshTime && _values.size() > 0){
-        int lastRefreshSeconds = (millis() - _currentValue.timestamp) / 1000;
+    //Left time marker
+    if(_displayLeftTimeMarker && _values.size() > 0){        
+        int maxTimeIntervalSeconds = (millis() - _values[0].timestamp) / 1000;
 
         _screen->setFont(NULL);_screen->setTextSize(1);
         _screen->setTextColor(ScaleColor);
         _screen->setCursor(_x + 5,_y + _height - 12);
-        _screen->print(stringifyTimeInterval(lastRefreshSeconds));
+        _screen->print(stringifyTimeInterval(maxTimeIntervalSeconds));
     }
 
     //Title & Value
@@ -173,8 +178,19 @@ String MetricTile::stringifyNumber(float number){
 }
 
 String MetricTile::stringifyTimeInterval(int seconds){
+    int minutes = (int)(seconds/60);
+    int hours = (int)(minutes/60);
+
     if(seconds < 60)return "<1m";
-    if(seconds < 60 * 60)return "~" + String((int)(seconds/60)) + "m";
-    if(seconds < 60 * 60 * 24)return "~" + String((int)(seconds/60/60)) + "h";
-    return "~" + String((int)(seconds/60/60/24)) + "d";
+    if(seconds < 60 * 60)return String(minutes) + "m";
+    if(seconds < 60 * 60 * 24){
+        int diffMinutes = minutes - hours*60;
+        if(diffMinutes % 5 < 3) diffMinutes -= diffMinutes % 5;
+        else if(diffMinutes < 55) diffMinutes += 5 - diffMinutes % 5;
+
+        return String(hours) + "h" + (diffMinutes < 10 ? "0" : "") + String(diffMinutes) + "m";
+    }
+    
+    int days = (int)(hours/24);
+    return String(days) + "d" + String(hours - days*24) + "h";
 }

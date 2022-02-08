@@ -10,7 +10,6 @@
 #include "Models/PresentingWeatherData.h"
 #include "Models/PresentingBackendWeatherData.h"
 #include "Models/Enums/NetworkStatus.h"
-#include "Log4Esp.h"
 #include <Ticker.h>
 
 typedef void (*RuntimePreferencesChangedEventCallback)(RuntimePreferences);
@@ -19,7 +18,7 @@ typedef void (*SourceChangedEventCallback)(Source);
 class UIController
 {
 public:
-    UIController(HardwareRegistry* HardwareRegistry, Logger* logger);
+    UIController(HardwareRegistry* HardwareRegistry);
     void updateUI();
     void onPresentingWeatherDataUpdate(PresentingWeatherData presentingWeatherData);
     void onPresentingBackendWeatherDataUpdate(PresentingBackendWeatherData presentingBackendWeatherData);
@@ -31,7 +30,8 @@ public:
 
 private:
     void updateInputs();
-    void drawInterface();
+    void drawMainButtons();
+    void clearInterface();
 
     void toggleLedEnabling();
     void toggleSoundEnabling();
@@ -39,7 +39,6 @@ private:
     void showDataScreen();  
     void applyMenuChanges(uint8_t selectedOption);  
 
-    Logger* _logger;
     Ticker* _timer;
 
     ScreenController* _screen;
@@ -54,8 +53,8 @@ private:
     RuntimePreferencesChangedEventCallback _onRuntimePreferencesChangedCallback;
     SourceChangedEventCallback _onSourceChangedCallback;
 
-    View _currentView = View::MAIN_SCREEN;
-    Source _currentSource = Source::MIXED_DATA;
+    volatile View _currentView = View::MAIN_SCREEN;
+    volatile Source _currentSource = Source::MIXED_DATA;
     RuntimePreferences _currentRuntimePreferences;
     bool _isSoundEnabled = false;
     bool _isLedEnabled = false;

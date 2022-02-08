@@ -6,19 +6,16 @@
 #include "Models/PresentingBackendWeatherData.h"
 #include <Ticker.h>
 #include "McpRGBLed.h"
-#include "Log4Esp.h"
 
 class LEDIndicatorsController
 {
 public:
-    LEDIndicatorsController(HardwareRegistry* hardwareRegistry, Logger* logger);
+    LEDIndicatorsController(HardwareRegistry* hardwareRegistry);
     void setWeatherStatus(PresentingWeatherData data);
     void setWeatherStatus(PresentingBackendWeatherData data);
     void clearAllIndicators();
 
 private:
-    Logger* _logger;
-
     McpRGBLed* _topLed;
     McpRGBLed* _bottomLed;
 

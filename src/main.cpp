@@ -1,11 +1,9 @@
 #include <config.h>
-#include "Log4Esp.h"
 #include "GlobalObjects/GlobalState.h"
 #include "ApplicationServices/WeatherMonitor.h"
 #include "ApplicationServices/BackendIntegrator.h"
 #include "ApplicationServices/UIController.h"
 
-Logger* logger;
 HardwareRegistry* hardwareRegistry;
 WeatherMonitor* weatherMonitor;
 BackendIntegrator* backendIntegrator;
@@ -21,14 +19,13 @@ void onSourceChangedEventHandler(Source source);
 void setup() {
     Serial.begin(9600);
 
-    logger = new Logger("defaultLogger", false);
-    hardwareRegistry = new HardwareRegistry(logger);
+    hardwareRegistry = new HardwareRegistry();
     hardwareRegistry->reconnectAllDisconnectedDevices();
 
-    weatherMonitor = new WeatherMonitor(hardwareRegistry, logger);
-    backendIntegrator = new BackendIntegrator(logger);
+    weatherMonitor = new WeatherMonitor(hardwareRegistry);
+    backendIntegrator = new BackendIntegrator();
 
-    uiController = new UIController(hardwareRegistry, logger);
+    uiController = new UIController(hardwareRegistry);
     uiController->addRuntimePreferencesChangedEventHandler(onRuntimePreferencesChangedEventHandler);
     uiController->addSourceChangedEventHandler(onSourceChangedEventHandler);
 
@@ -67,9 +64,14 @@ void onBlockingEventHandler(bool isBlocked){
 }
 
 void onRuntimePreferencesChangedEventHandler(RuntimePreferences runtimePreferences){
-    
+    weatherMonitor->setMeasurementMode(runtimePreferences.mode);
+    backendIntegrator->setRefreshMode(runtimePreferences.mode);
 }
 
 void onSourceChangedEventHandler(Source source){
-    
+    if(source == Source::LOCAL_DATA)backendIntegrator->stop();
+    else backendIntegrator->run();
+
+    if(source == Source::OUT_WEATHER)weatherMonitor->stop();
+    else weatherMonitor->run();
 }

@@ -1,13 +1,12 @@
 #include "ApplicationServices/UIController.h"
 #include "Config.h"
 
-UIController::UIController(HardwareRegistry* HardwareRegistry, Logger* logger)
+UIController::UIController(HardwareRegistry* HardwareRegistry)
 {
-    _logger = logger;
-    _screen = new ScreenController(HardwareRegistry, logger);
-    _ledIndicators = new LEDIndicatorsController(HardwareRegistry, logger);
-    _soundController = new SoundController(HardwareRegistry, logger);
-    _inputsController = new InputsController(HardwareRegistry, logger);
+    _screen = new ScreenController(HardwareRegistry);
+    _ledIndicators = new LEDIndicatorsController(HardwareRegistry);
+    _soundController = new SoundController(HardwareRegistry);
+    _inputsController = new InputsController(HardwareRegistry);
     _menuController = new MenuController(HardwareRegistry);
 
     _timer = new Ticker(UI_REDRAW_INTERVAL_MS);
@@ -15,6 +14,7 @@ UIController::UIController(HardwareRegistry* HardwareRegistry, Logger* logger)
 
     //Draw splash data
     showDataScreen();
+    drawMainButtons();
     onNetworkStatusChange(NetworkStatus::DISABLED);
 }
 
@@ -24,10 +24,16 @@ void UIController::updateUI() {
         _menuController->updateUI();
         switch(_menuController->getStatus()){
             case MenuStatus::FINISHED:
-                applyMenuChanges(_menuController->getCurrentOption());
+                applyMenuChanges(_menuController->getCurrentOption());               
+                clearInterface();
+                _currentView = View::MAIN_SCREEN;
+                drawMainButtons();
                 showDataScreen();
             break;
             case MenuStatus::CANCELED:
+                clearInterface();
+                _currentView = View::MAIN_SCREEN;                
+                drawMainButtons();
                 showDataScreen();
             break;
             case MenuStatus::PENDING:break;
@@ -73,7 +79,6 @@ void UIController::onPresentingWeatherDataUpdate(PresentingWeatherData presentin
     
     if(_currentView == View::MAIN_SCREEN){
         _screen->showDataScreen(_currentSource, _currentPresentingWeatherData);    
-        drawInterface();
     }
 }
 
@@ -84,7 +89,6 @@ void UIController::onPresentingBackendWeatherDataUpdate(PresentingBackendWeather
 
     if(_currentView == View::MAIN_SCREEN){
         _screen->showDataScreen(_currentSource, _currentPresentingBackendWeatherData);    
-        drawInterface();
     }
 }
 
@@ -94,17 +98,21 @@ void UIController::onNetworkStatusChange(NetworkStatus networkStatus){
 
 void UIController::onBlocking(bool isBlocked){
     _isBlocked = isBlocked;
-    drawInterface();
+    drawMainButtons();
 }
 
-void UIController::drawInterface(){
+void UIController::drawMainButtons(){
     if(_currentView == View::MAIN_SCREEN)
         _screen->showMainButtons(_isBlocked, _isLedEnabled, _isSoundEnabled);
 }
 
+void UIController::clearInterface(){
+    _screen->clearInterface();
+}
+
 void UIController::toggleLedEnabling(){
     _isLedEnabled = !_isLedEnabled;
-    drawInterface();
+    drawMainButtons();
     if(_isLedEnabled){
         _ledIndicators->setWeatherStatus(_currentPresentingWeatherData);
         _ledIndicators->setWeatherStatus(_currentPresentingBackendWeatherData);
@@ -114,7 +122,7 @@ void UIController::toggleLedEnabling(){
 
 void UIController::toggleSoundEnabling(){
     _isSoundEnabled = !_isSoundEnabled;
-    drawInterface();
+    drawMainButtons();
     if(_isSoundEnabled){
         _soundController->enableAlerting(_currentPresentingWeatherData.GetOverallWarningLevel());
     }
@@ -131,8 +139,7 @@ void UIController::showMenuScreen(Menu menu){
     }
 }
 
-void UIController::showDataScreen(){
-    _currentView = View::MAIN_SCREEN;
+void UIController::showDataScreen(){    
     onPresentingWeatherDataUpdate(_currentPresentingWeatherData);
     onPresentingBackendWeatherDataUpdate(_currentPresentingBackendWeatherData);
 }

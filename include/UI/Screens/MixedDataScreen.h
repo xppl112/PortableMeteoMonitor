@@ -1,15 +1,14 @@
-#ifndef DashboardScreen_H
-#define DashboardScreen_H
+#pragma once
 
 #include "Models/PresentingWeatherData.h"
 #include "Models/PresentingBackendWeatherData.h"
 #include "UI/Screens/Elements/MetricTile.h"
 #include <Adafruit_ST7789.h> 
 
-class DashboardScreen
+class MixedDataScreen
 {
 public:
-    DashboardScreen(Adafruit_ST7789* screen);
+    MixedDataScreen(Adafruit_ST7789* screen);
 
     void showWeatherData(PresentingWeatherData weatherData);
     void showBackendWeatherData(PresentingBackendWeatherData backendWeatherData);
@@ -20,5 +19,3 @@ private:
 
     TileStatus mapWarningLevelToTileStatus(WarningLevel level);
 };
-
-#endif

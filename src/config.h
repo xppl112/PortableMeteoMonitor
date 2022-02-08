@@ -4,13 +4,19 @@
 #include <MCP.h>
 #include <SPI.h>
 
-const short DEFAULT_MEASUREMENT_DURATION_SECONDS = 30;
-const short DEFAULT_CALMDOWN_DURATION_SECONDS = 10;
+static const uint16_t DEFAULT_MEASUREMENT_DURATION_SECONDS = 30;
+static const uint16_t DEFAULT_CALMDOWN_DURATION_SECONDS = 10;
+static const uint16_t ACTIVE_MEASUREMENT_DURATION_SECONDS = 5;
+static const uint16_t ACTIVE_CALMDOWN_DURATION_SECONDS = 0;
+static const uint16_t NIGHT_MEASUREMENT_DURATION_SECONDS = 60;
+static const uint16_t NIGHT_CALMDOWN_DURATION_SECONDS = 1140;//19 minutes
+
+static const uint16_t DEFAULT_BACKEND_REFRESH_INTERVAL_SECONDS = 60;
+static const uint16_t NIGHT_BACKEND_REFRESH_INTERVAL_SECONDS = 1200;
+
 const int HEALTHCHECK_INTERVAL_MS = 1000;
 const int UI_REDRAW_INTERVAL_MS = 1000;
 static const uint8_t DATA_COLLECTION_CAPACITY = 30;
-
-static const uint16_t BACKEND_REFRESH_INTERVAL_SECONDS = 30;
 
 static const int CO2_LEVEL_WARNING = 1000;
 static const int CO2_LEVEL_ALERT = 1500;
@@ -64,8 +70,8 @@ const uint8_t BUZZER_PIN = MCP_A1;
 const uint8_t LIGHT_SENSOR_PIN = A0;
 
 // BACKEND INTEGRATION
-#define WIFI_SSID "Sasha home"
-#define WIFI_PASSWORD "0672589600"
+#define WIFI_SSID "xppl"
+#define WIFI_PASSWORD "william2015"
 
 #define SERVER_HOST "http://weather.liashko.space"
 #define SERVER_API_GET_TIME "/api/time"

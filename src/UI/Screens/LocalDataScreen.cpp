@@ -1,15 +1,15 @@
-#include "UI/Screens/DashboardScreen.h"
+#include "UI/Screens/LocalDataScreen.h"
 #include "StringUtils.h"
 #include "config.h"
 #include <Adafruit_GFX.h>
 
-DashboardScreen::DashboardScreen(Adafruit_ST7789* screen){
+LocalDataScreen::LocalDataScreen(Adafruit_ST7789* screen){
     _screen = screen;
-    _co2Tile = new MetricTile(_screen,0,0,159,72,true);
+    _co2Tile = new MetricTile(_screen,0,0,159,72,false);
     _co2Tile->setupGraph(true, true, TileGraphColor::BLUE);
     _co2Tile->setTitle("CO2");
 
-    _PMTile = new MetricTile(_screen,0,74,159,72,true);
+    _PMTile = new MetricTile(_screen,0,74,159,72,false);
     _PMTile->setupGraph(true, true, TileGraphColor::BLUE);
     _PMTile->setTitle("PM2.5");
 
@@ -17,20 +17,20 @@ DashboardScreen::DashboardScreen(Adafruit_ST7789* screen){
     _ch2oTile->setupGraph(true, true, TileGraphColor::BLUE);
     _ch2oTile->setTitle("CH2O");
 
-    _outTempTile = new MetricTile(_screen,161,0,159,72,true,1);
-    _outTempTile->setupGraph(true, true, TileGraphColor::PURPLE);
-    _outTempTile->setTitle("out t");
+    _tempTile = new MetricTile(_screen,161,0,159,72,false,1);
+    _tempTile->setupGraph(true, true, TileGraphColor::BLUE);
+    _tempTile->setTitle("temperature");
 
-    _outPMTile = new MetricTile(_screen,161,74,159,72,true);
-    _outPMTile->setupGraph(true, true, TileGraphColor::PURPLE);
-    _outPMTile->setTitle("out PM2.5");
+    _humTile = new MetricTile(_screen,161,74,159,72,false);
+    _humTile->setupGraph(true, true, TileGraphColor::BLUE);
+    _humTile->setTitle("humidity");
 
-    _outPressureTile = new MetricTile(_screen,161,148,159,72,true);
-    _outPressureTile->setupGraph(true, true, TileGraphColor::PURPLE);
-    _outPressureTile->setTitle("out pressure");
+    _pressureTile = new MetricTile(_screen,161,148,159,72,true);
+    _pressureTile->setupGraph(true, false, TileGraphColor::BLUE);
+    _pressureTile->setTitle("pressure");
 }
 
-void DashboardScreen::showWeatherData(PresentingWeatherData weatherData){
+void LocalDataScreen::showWeatherData(PresentingWeatherData weatherData){
     std::vector<TileDataItem> tileData(DATA_COLLECTION_CAPACITY);
 
     if(weatherData.weatherMonitorHistoricalData.size() != 0){
@@ -69,56 +69,47 @@ void DashboardScreen::showWeatherData(PresentingWeatherData weatherData){
         }
         _ch2oTile->setValues(tileData);
         _ch2oTile->setStatus(mapWarningLevelToTileStatus(weatherData.CH2OWarningLevel));
-    }
 
-    _co2Tile->redraw();
-    _PMTile->redraw();
-    _ch2oTile->redraw();
-}
-
-void DashboardScreen::showBackendWeatherData(PresentingBackendWeatherData backendWeatherData){
-    std::vector<TileDataItem> tileData(DATA_COLLECTION_CAPACITY);
-
-    if(backendWeatherData.backendWeatherHistoricalData.size() != 0){
         //temp
         tileData.clear();
-        for (auto const& dataItem : backendWeatherData.backendWeatherHistoricalData){
+        for (auto const& dataItem : weatherData.weatherMonitorHistoricalData){
             tileData.push_back(TileDataItem {
                 .timestamp =  dataItem.timestamp,
                 .value =  dataItem.temperatureCelsium
             });
         }
-        _outTempTile->setValues(tileData);
+        _tempTile->setValues(tileData);
 
-        //out PM2.5
+        //humidity
         tileData.clear();
-        for (auto const& dataItem : backendWeatherData.backendWeatherHistoricalData){
-            if(dataItem.PM_2_5 == -1)continue;
+        for (auto const& dataItem : weatherData.weatherMonitorHistoricalData){
             tileData.push_back(TileDataItem {
                 .timestamp =  dataItem.timestamp,
-                .value =  (float)dataItem.PM_2_5
+                .value =  (float)dataItem.humidityPercent
             });
         }
-        _outPMTile->setValues(tileData);
-        _outPMTile->setStatus(mapWarningLevelToTileStatus(backendWeatherData.PMWarningLevel));
+        _humTile->setValues(tileData);
 
-        //out Pressure
+        //pressure
         tileData.clear();
-        for (auto const& dataItem : backendWeatherData.backendWeatherHistoricalData){
+        for (auto const& dataItem : weatherData.weatherMonitorHistoricalData){
             tileData.push_back(TileDataItem {
                 .timestamp =  dataItem.timestamp,
                 .value =  dataItem.pressureInHPascals
             });
         }
-        _outPressureTile->setValues(tileData);
+        _pressureTile->setValues(tileData);
     }
 
-    _outTempTile->redraw();
-    _outPMTile->redraw();
-    _outPressureTile->redraw();
+    _co2Tile->redraw();
+    _PMTile->redraw();
+    _ch2oTile->redraw();
+    _tempTile->redraw();
+    _humTile->redraw();
+    _pressureTile->redraw();
 }
 
-TileStatus DashboardScreen::mapWarningLevelToTileStatus(WarningLevel level){
+TileStatus LocalDataScreen::mapWarningLevelToTileStatus(WarningLevel level){
     if(level == WarningLevel::WARNING)return TileStatus::WARNING;
     if(level == WarningLevel::HI_WARNING_LEVEL)return TileStatus::ALERT;
     return TileStatus::NORMAL;

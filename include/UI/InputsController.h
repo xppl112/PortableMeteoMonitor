@@ -3,19 +3,16 @@
 #include "HardwareModules/HardwareRegistry.h"
 #include "HardwareModules/MCPExtender.h"
 #include <BounceMcp.h>
-#include "Log4Esp.h"
 
 enum class ButtonPressed {NONE, TOUCH, LEFT, CENTER, RIGHT};
 
 class InputsController
 {
 public:
-    InputsController(HardwareRegistry* hardwareRegistry, Logger* logger);
+    InputsController(HardwareRegistry* hardwareRegistry);
     ButtonPressed updateInputs();
 
 private:
-    Logger* _logger;
-
     Button* _touchButton;
     Button* _leftButton;
     Button* _centerButton;

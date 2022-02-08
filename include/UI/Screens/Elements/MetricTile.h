@@ -26,7 +26,7 @@ public:
     MetricTile(
         Adafruit_ST7789* screen, 
         uint16_t x, uint16_t y, uint16_t width, uint16_t height, 
-        bool displayRefreshTime, uint8_t decimalCount = 0);
+        bool displayLeftTimeMarker, uint8_t decimalCount = 0);
 
     void setTitle(String title) {_title = title;}
     void setStatus(TileStatus status);
@@ -35,7 +35,7 @@ public:
     void setValue(float value) {_currentValue = TileDataItem {.value = value};}
     void setValues(std::vector<TileDataItem> values);
 
-    void setupGraph(bool displayGraph, bool displayScale, TileGraphColor graphColor, bool changeColorByStatus = true);
+    void setupGraph(bool displayGraph, bool displayScale, TileGraphColor graphColor, bool changeColorByStatus = true, bool showTimeGaps = false);
     
     void redraw(bool fullRedraw = false);
     
@@ -49,8 +49,9 @@ private:
 
     bool _displayGraph = false;
     bool _displayScale = false;
-    bool _displayRefreshTime = false;
+    bool _displayLeftTimeMarker = false;
     bool _changeGraphColorByStatus = true;
+    bool _showTimeGaps = false;
 
     TileDataItem _currentValue;
     std::vector<TileDataItem> _values;

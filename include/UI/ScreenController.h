@@ -5,27 +5,30 @@
 #include "Models/PresentingWeatherData.h"
 #include "Models/Enums/NetworkStatus.h"
 #include "Models/Enums/Source.h"
-#include "Log4Esp.h"
 
-#include "UI/Screens/DashboardScreen.h"
+#include "UI/Screens/MixedDataScreen.h"
+#include "UI/Screens/LocalDataScreen.h"
+#include "UI/Screens/OutWeatherScreen.h"
 
 class ScreenController
 {
 public:
-    ScreenController(HardwareRegistry* hardwareRegistry, Logger* logger);
+    ScreenController(HardwareRegistry* hardwareRegistry);
     void clearScreen();
     void backlight(bool on);
     void showDataScreen(Source source, PresentingWeatherData weatherData);
     void showDataScreen(Source source, PresentingBackendWeatherData backendWeatherData);    
     void showNetworkStatusIcon(NetworkStatus status);
     void showMainButtons(bool blocked, bool isLedEnabled, bool isSoundEnabled);
+    void clearInterface();
 
 private:
     TFTScreen* _screenDevice;
     Adafruit_ST7789* _screen;
-    Logger* _logger;
 
-    DashboardScreen* _dashboardScreen;
+    MixedDataScreen* _mixedDataScreen;
+    LocalDataScreen* _localDataScreen;
+    OutWeatherScreen* _outWeatherScreen;
 
     static const uint16_t ScreenBackgroundColor = 0x18E3;
 
