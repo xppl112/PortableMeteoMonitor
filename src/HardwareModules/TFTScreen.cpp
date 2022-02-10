@@ -66,4 +66,5 @@ void TFTScreen::backLight(bool enable){
         _mcp->digitalWrite(_backlightPin, enable);
         #endif
     }
+    _screen->enableDisplay(enable);
 }

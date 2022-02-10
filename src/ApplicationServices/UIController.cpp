@@ -39,6 +39,11 @@ void UIController::updateUI() {
             case MenuStatus::PENDING:break;
         }
     }
+
+    if(_currentRuntimePreferences.mode == Mode::NIGHT){
+        if(!_noLightsMode && millis()-_lastInteractionTimestamp > USER_INTERACTION_DELAY_TIME_MS)
+            setLightsMode(false);
+    }
     
     _timer->update();
     if(_timer->state() == FIRED){
@@ -50,32 +55,41 @@ void UIController::updateUI() {
 void UIController::updateInputs() {
     ButtonPressed buttonPressed = _inputsController->updateInputs();
 
-    switch(buttonPressed){
-        case ButtonPressed::TOUCH:
-            if(_currentView == View::MAIN_SCREEN) showMenuScreen(Menu::MODE_MENU);
-            else if(_currentView == View::MODE_MENU) _menuController->selectNextOption();
-            break;
-        case ButtonPressed::LEFT:
-            if(_currentView == View::MAIN_SCREEN) showMenuScreen(Menu::SOURCE_MENU);
-            else if(_currentView == View::SOURCE_MENU) _menuController->selectNextOption();
-            break;
-        case ButtonPressed::CENTER:
-            if(_currentView == View::MAIN_SCREEN) toggleLedEnabling();
-            //else _menuController->modifyOption();
-            break;
-        case ButtonPressed::RIGHT:
-            if(_currentView == View::MAIN_SCREEN) toggleSoundEnabling();
-            else _menuController->cancel();
-            break;
-        case ButtonPressed::NONE:break;
+    if(!_noLightsMode){
+        switch(buttonPressed){
+            case ButtonPressed::TOUCH:
+                if(_currentView == View::MAIN_SCREEN) showMenuScreen(Menu::MODE_MENU);
+                else if(_currentView == View::MODE_MENU) _menuController->selectNextOption();
+                break;
+            case ButtonPressed::LEFT:
+                if(_currentView == View::MAIN_SCREEN) showMenuScreen(Menu::SOURCE_MENU);
+                else if(_currentView == View::SOURCE_MENU) _menuController->selectNextOption();
+                break;
+            case ButtonPressed::CENTER:
+                if(_currentView == View::MAIN_SCREEN) toggleLedEnabling();
+                //else _menuController->modifyOption();
+                break;
+            case ButtonPressed::RIGHT:
+                if(_currentView == View::MAIN_SCREEN) toggleSoundEnabling();
+                else _menuController->cancel();
+                break;
+            case ButtonPressed::NONE:break;
+        }
+    }
+
+    if(buttonPressed != ButtonPressed::NONE){
+        _lastInteractionTimestamp = millis();
+        if(_currentRuntimePreferences.mode == Mode::NIGHT && _noLightsMode)setLightsMode(true);
     }
 }
 
 void UIController::onPresentingWeatherDataUpdate(PresentingWeatherData presentingWeatherData){
     _currentPresentingWeatherData = presentingWeatherData;
     
-    if(_isLedEnabled)_ledIndicators->setWeatherStatus(_currentPresentingWeatherData);
-    if(_isSoundEnabled)_soundController->setWarningLevel(_currentPresentingWeatherData.GetOverallWarningLevel());
+    if(!_noLightsMode){
+        if(_isLedEnabled)_ledIndicators->setWeatherStatus(_currentPresentingWeatherData);
+        if(_isSoundEnabled)_soundController->setWarningLevel(_currentPresentingWeatherData.GetOverallWarningLevel());
+    }
     
     if(_currentView == View::MAIN_SCREEN){
         _screen->showDataScreen(_currentSource, _currentPresentingWeatherData);    
@@ -85,7 +99,9 @@ void UIController::onPresentingWeatherDataUpdate(PresentingWeatherData presentin
 void UIController::onPresentingBackendWeatherDataUpdate(PresentingBackendWeatherData presentingBackendWeatherData){
     _currentPresentingBackendWeatherData = presentingBackendWeatherData;
     
-    if(_isLedEnabled)_ledIndicators->setWeatherStatus(_currentPresentingBackendWeatherData);
+    if(!_noLightsMode){
+        if(_isLedEnabled)_ledIndicators->setWeatherStatus(_currentPresentingBackendWeatherData);
+    }
 
     if(_currentView == View::MAIN_SCREEN){
         _screen->showDataScreen(_currentSource, _currentPresentingBackendWeatherData);    
@@ -154,5 +170,21 @@ void UIController::applyMenuChanges(uint8_t selectedOption){
         if(selectedOption == (uint8_t)_currentSource)return;
         _currentSource = (Source)selectedOption;
         if(_onSourceChangedCallback != NULL)_onSourceChangedCallback(_currentSource);
+    }
+}
+
+void UIController::setLightsMode(bool standardLight){
+    if(standardLight){
+        if(_isLedEnabled){
+            _ledIndicators->setWeatherStatus(_currentPresentingWeatherData);
+            _ledIndicators->setWeatherStatus(_currentPresentingBackendWeatherData);
+        }
+        _screen->backlight(true);
+        _noLightsMode = false;
+    }
+    else {
+        _ledIndicators->clearAllIndicators();
+        _screen->backlight(false);
+        _noLightsMode = true;
     }
 }

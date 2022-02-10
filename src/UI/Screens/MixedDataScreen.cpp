@@ -33,43 +33,41 @@ MixedDataScreen::MixedDataScreen(Adafruit_ST7789* screen){
 void MixedDataScreen::showWeatherData(PresentingWeatherData weatherData){
     std::vector<TileDataItem> tileData(DATA_COLLECTION_CAPACITY);
 
-    if(weatherData.weatherMonitorHistoricalData.size() != 0){
-        //CO2
-        tileData.clear();
-        for (auto const& dataItem : weatherData.weatherMonitorHistoricalData){
-            if(dataItem.CO2 == -1)continue;
-            tileData.push_back(TileDataItem {
-                .timestamp =  dataItem.timestamp,
-                .value =  (float)dataItem.CO2
-            });
-        }
-        _co2Tile->setValues(tileData);
-        _co2Tile->setStatus(mapWarningLevelToTileStatus(weatherData.CO2WarningLevel));
-
-        //PM_2_5
-        tileData.clear();
-        for (auto const& dataItem : weatherData.weatherMonitorHistoricalData){
-            if(dataItem.PM_2_5 == -1)continue;
-            tileData.push_back(TileDataItem {
-                .timestamp =  dataItem.timestamp,
-                .value =  (float)dataItem.PM_2_5
-            });
-        }
-        _PMTile->setValues(tileData);
-        _PMTile->setStatus(mapWarningLevelToTileStatus(weatherData.PMWarningLevel));
-
-        //CH2O
-        tileData.clear();
-        for (auto const& dataItem : weatherData.weatherMonitorHistoricalData){
-            if(dataItem.CH2O == -1)continue;
-            tileData.push_back(TileDataItem {
-                .timestamp =  dataItem.timestamp,
-                .value =  (float)dataItem.CH2O
-            });
-        }
-        _ch2oTile->setValues(tileData);
-        _ch2oTile->setStatus(mapWarningLevelToTileStatus(weatherData.CH2OWarningLevel));
+    //CO2
+    tileData.clear();
+    for (auto const& dataItem : weatherData.weatherMonitorHistoricalData){
+        if(dataItem.CO2 == -1)continue;
+        tileData.push_back(TileDataItem {
+            .timestamp =  dataItem.timestamp,
+            .value =  (float)dataItem.CO2
+        });
     }
+    _co2Tile->setValues(tileData);
+    _co2Tile->setStatus(mapWarningLevelToTileStatus(weatherData.CO2WarningLevel));
+
+    //PM_2_5
+    tileData.clear();
+    for (auto const& dataItem : weatherData.weatherMonitorHistoricalData){
+        if(dataItem.PM_2_5 == -1)continue;
+        tileData.push_back(TileDataItem {
+            .timestamp =  dataItem.timestamp,
+            .value =  (float)dataItem.PM_2_5
+        });
+    }
+    _PMTile->setValues(tileData);
+    _PMTile->setStatus(mapWarningLevelToTileStatus(weatherData.PMWarningLevel));
+
+    //CH2O
+    tileData.clear();
+    for (auto const& dataItem : weatherData.weatherMonitorHistoricalData){
+        if(dataItem.CH2O == -1)continue;
+        tileData.push_back(TileDataItem {
+            .timestamp =  dataItem.timestamp,
+            .value =  (float)dataItem.CH2O
+        });
+    }
+    _ch2oTile->setValues(tileData);
+    _ch2oTile->setStatus(mapWarningLevelToTileStatus(weatherData.CH2OWarningLevel));
 
     _co2Tile->redraw();
     _PMTile->redraw();

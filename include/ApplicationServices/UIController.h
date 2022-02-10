@@ -38,6 +38,7 @@ private:
     void showMenuScreen(Menu menu);  
     void showDataScreen();  
     void applyMenuChanges(uint8_t selectedOption);  
+    void setLightsMode(bool standardLight);
 
     Ticker* _timer;
 
@@ -59,4 +60,7 @@ private:
     bool _isSoundEnabled = false;
     bool _isLedEnabled = false;
     bool _isBlocked = false;
+
+    unsigned long _lastInteractionTimestamp = 0;
+    bool _noLightsMode = false;
 };
